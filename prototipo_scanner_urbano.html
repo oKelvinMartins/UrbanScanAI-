@@ -1,0 +1,2325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UrbanScan AI — App Câmera Cidadão, Scanner Automático &amp; Painel da Prefeitura</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --background: #0b1120;
+      --content: #0f172a;
+      --card: #111827;
+      --sidebar: #0f172a;
+      --border: #334155;
+      --card-border: #1e293b;
+      --foreground: #f8fafc;
+      --muted-foreground: #94a3b8;
+      --placeholder: #64748b;
+      --primary: #3b82f6;
+      --primary-foreground: #ffffff;
+      --secondary: #1e293b;
+      --secondary-foreground: #e2e8f0;
+      --accent: #06b6d4;
+      --link: #60a5fa;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --chart-1: #3b82f6;
+      --chart-2: #22c55e;
+      --chart-3: #06b6d4;
+      --chart-4: #f59e0b;
+      --chart-5: #ef4444;
+      --chart-6: #a855f7;
+    }
+    html.light {
+      --background: #f1f5f9;
+      --content: #e2e8f0;
+      --card: #ffffff;
+      --sidebar: #f8fafc;
+      --border: #cbd5e1;
+      --card-border: #e2e8f0;
+      --foreground: #0f172a;
+      --muted-foreground: #64748b;
+      --placeholder: #94a3b8;
+      --primary: #2563eb;
+      --primary-foreground: #ffffff;
+      --secondary: #f1f5f9;
+      --secondary-foreground: #1e293b;
+      --accent: #0891b2;
+      --link: #2563eb;
+      --success: #16a34a;
+      --warning: #d97706;
+      --error: #dc2626;
+      --chart-3: #0891b2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .surface-subtle {
+      background-color: color-mix(in srgb, var(--foreground) 4%, transparent);
+    }
+    .badge-critical {
+      background-color: color-mix(in srgb, var(--error) 15%, transparent);
+      color: var(--error);
+      border: 1px solid color-mix(in srgb, var(--error) 35%, transparent);
+    }
+    .badge-high {
+      background-color: color-mix(in srgb, var(--warning) 16%, transparent);
+      color: var(--warning);
+      border: 1px solid color-mix(in srgb, var(--warning) 35%, transparent);
+    }
+    .badge-moderate {
+      background-color: color-mix(in srgb, var(--chart-3, var(--accent)) 15%, transparent);
+      color: var(--chart-3, var(--accent));
+      border: 1px solid color-mix(in srgb, var(--chart-3, var(--accent)) 35%, transparent);
+    }
+    .badge-success {
+      background-color: color-mix(in srgb, var(--success) 15%, transparent);
+      color: var(--success);
+      border: 1px solid color-mix(in srgb, var(--success) 35%, transparent);
+    }
+    .badge-primary {
+      background-color: color-mix(in srgb, var(--primary) 15%, transparent);
+      color: var(--primary);
+      border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);
+    }
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+    .btn-primary:hover {
+      filter: brightness(1.08);
+    }
+    .btn-outline {
+      background-color: var(--card);
+      color: var(--foreground);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover {
+      background-color: color-mix(in srgb, var(--foreground) 6%, var(--card));
+    }
+
+    .lumo-stage {
+      background:
+        radial-gradient(circle at 22% 28%, rgba(250, 204, 21, 0.08), transparent 46%),
+        radial-gradient(circle at 78% 70%, rgba(56, 189, 248, 0.10), transparent 52%),
+        linear-gradient(145deg, #090c12 0%, #121722 52%, #07090d 100%);
+    }
+    .lumo-phone-frame {
+      background: linear-gradient(160deg, #2b313c 0%, #11141a 28%, #090b0f 75%, #242934 100%);
+      box-shadow:
+        0 28px 64px -14px rgba(0, 0, 0, 0.85),
+        inset 0 0 0 1.5px rgba(255, 255, 255, 0.14),
+        0 0 0 1px rgba(0, 0, 0, 0.9);
+    }
+    .lumo-screen {
+      background: linear-gradient(180deg, #0d131c 0%, #090b10 42%, #06070a 100%);
+    }
+    .lumo-glass {
+      background: linear-gradient(145deg, rgba(32, 38, 49, 0.78), rgba(14, 17, 23, 0.86));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    .lumo-glass-light {
+      background: rgba(255, 255, 255, 0.09);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+    }
+    .lumo-yellow {
+      background-color: #facc15;
+      color: #090b10;
+    }
+    .lumo-yellow:hover {
+      background-color: #fde047;
+    }
+
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background-color: color-mix(in srgb, var(--muted-foreground) 30%, transparent);
+      border-radius: 9999px;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.9; }
+      70% { transform: scale(1.45); opacity: 0; }
+      100% { transform: scale(1.45); opacity: 0; }
+    }
+    .live-pulse { position: relative; }
+    .live-pulse::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background-color: var(--success);
+      animation: pulse-ring 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    }
+    @keyframes flash-new {
+      0% { box-shadow: 0 0 0 2px var(--primary); }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+    .card-new-flash { animation: flash-new 1.5s ease-out; }
+  </style>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased min-h-screen">
+  <div class="max-w-[1640px] mx-auto px-3 sm:px-5 py-4 space-y-4">
+
+    <!-- HEADER PRINCIPAL -->
+    <header class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 shadow-sm">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div class="flex items-start sm:items-center gap-3">
+          <div class="w-11 h-11 rounded-xl lumo-yellow flex items-center justify-center shrink-0 shadow-sm">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+              <circle cx="12" cy="12" r="7" />
+              <circle cx="12" cy="12" r="2.2" fill="currentColor" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <h1 class="text-lg sm:text-xl font-bold tracking-tight">UrbanScan AI</h1>
+              <span class="badge-success text-xs font-semibold px-2.5 py-0.5 rounded-full inline-flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[var(--success)] live-pulse inline-block"></span>
+                App Mobile + Scanner Automático
+              </span>
+              <span class="badge-primary text-xs font-medium px-2 py-0.5 rounded-full">Protótipo Interativo</span>
+            </div>
+            <p class="text-xs sm:text-sm text-[var(--muted-foreground)] mt-0.5">
+              Simule o cidadão apontando o celular e tirando foto na rua — ou alterne para Cabine/Moto e ative o scanner automático em tempo real.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="themeToggleBtn" type="button" class="btn-outline text-xs font-medium px-2.5 py-2 rounded-lg inline-flex items-center gap-1.5 transition cursor-pointer" title="Alternar tema claro/escuro">
+            <span id="themeIcon">☀️</span>
+          </button>
+
+          <button id="toggleCompareBtn" type="button" class="btn-outline text-xs font-medium px-3 py-2 rounded-lg inline-flex items-center gap-1.5 transition cursor-pointer">
+            <svg class="w-4 h-4 text-[var(--primary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+            </svg>
+            <span id="compareBtnText">Ocultar Comparativo</span>
+          </button>
+
+          <div class="inline-flex rounded-lg p-1 border border-[var(--border)] surface-subtle" role="group" aria-label="Modo de visualização">
+            <button data-view="split" class="view-mode-btn text-xs font-medium px-3 py-1.5 rounded-md transition cursor-pointer">
+              Visão Integrada
+            </button>
+            <button data-view="scanner" class="view-mode-btn text-xs font-medium px-3 py-1.5 rounded-md transition cursor-pointer">
+              Foco: App Celular
+            </button>
+            <button data-view="dashboard" class="view-mode-btn text-xs font-medium px-3 py-1.5 rounded-md transition cursor-pointer">
+              Foco: Painel Prefeitura
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPARATIVO ANTES VS INOVAÇÃO -->
+      <div id="comparisonBanner" class="mt-4 pt-3 border-t border-[var(--card-border)] grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="rounded-lg p-3 border border-[var(--border)] surface-subtle flex items-start gap-3">
+          <div class="w-7 h-7 rounded-lg badge-critical flex items-center justify-center shrink-0 text-xs font-bold">✕</div>
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold">Modo Foto Manual (Cidadão Parado)</span>
+              <span class="text-xs text-[var(--muted-foreground)]">1 clique para testar no app</span>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              No modelo tradicional o cidadão para, enquadra e clica para fotografar o buraco. Use o botão obturador no celular abaixo para simular exatamente essa captura assistida por IA.
+            </p>
+          </div>
+        </div>
+
+        <div class="rounded-lg p-3 border border-[var(--border)] flex items-start gap-3" style="background-color: color-mix(in srgb, var(--primary) 8%, transparent);">
+          <div class="w-7 h-7 rounded-lg badge-success flex items-center justify-center shrink-0 text-xs font-bold">✓</div>
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold">Inovação UrbanScan AI (Auto-Scan em Movimento)</span>
+              <span class="text-xs font-semibold text-[var(--success)]">0 cliques • 60 FPS</span>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Alterne para <strong>Auto-Scan</strong> (ou visão <strong>Cabine / Moto</strong>): a câmera analisa o vídeo continuamente, identifica os 4 tipos de problema e envia GPS + gravidade à prefeitura sem intervenção.
+            </p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- LAYOUT PRINCIPAL -->
+    <main id="mainGrid" class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
+
+      <!-- MÓDULO 1: PALCO ESCURO + MOCKUP DO APP DE CELULAR -->
+      <section id="scannerSection" class="xl:col-span-5 lumo-stage border border-[var(--border)] rounded-2xl overflow-hidden shadow-lg relative p-4 sm:p-5 flex flex-col justify-between">
+        <div aria-hidden="true" class="pointer-events-none select-none absolute inset-x-0 top-4 text-center overflow-hidden">
+          <div class="text-[76px] sm:text-[106px] font-black tracking-[0.14em] leading-none text-white/[0.045] uppercase">URBAN</div>
+        </div>
+
+        <div class="relative z-10 flex flex-wrap items-center justify-between gap-2 mb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg lumo-yellow flex items-center justify-center shadow">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6">
+                <circle cx="12" cy="12" r="6.5" />
+                <circle cx="12" cy="12" r="2" fill="currentColor" />
+              </svg>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-white">Simulador Mobile</div>
+              <div class="text-xs text-zinc-400">Toque na câmera ou no obturador</div>
+            </div>
+          </div>
+
+          <div class="inline-flex rounded-full p-0.5 lumo-glass text-xs">
+            <button id="modeManualBtn" type="button" class="px-2.5 py-1 rounded-full font-semibold transition cursor-pointer">
+              📸 Foto Cidadão
+            </button>
+            <button id="modeAutoBtn" type="button" class="px-2.5 py-1 rounded-full font-medium transition cursor-pointer">
+              ⚡ Auto-Scan Vídeo
+            </button>
+          </div>
+        </div>
+
+        <div class="relative z-10 flex items-center justify-center gap-6 my-1">
+          <aside id="floatingLeftCard" class="hidden w-52 lumo-glass rounded-2xl p-3 text-white space-y-2.5 shrink-0 self-center">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs font-semibold">Alvo Detectável</div>
+                <div class="text-[11px] text-zinc-400">Toque para trocar</div>
+              </div>
+              <button id="floatSpawnBtn" type="button" class="w-7 h-7 rounded-full lumo-glass-light flex items-center justify-center text-xs hover:bg-white/20 cursor-pointer" title="Injetar na via">↗</button>
+            </div>
+            <div class="flex items-center justify-between gap-2 py-1">
+              <button id="floatPrevTarget" type="button" class="w-7 h-7 rounded-full lumo-glass-light flex items-center justify-center text-xs cursor-pointer">‹</button>
+              <div id="floatTargetPreview" class="flex flex-col items-center gap-1"></div>
+              <button id="floatNextTarget" type="button" class="w-7 h-7 rounded-full bg-white text-slate-900 font-bold flex items-center justify-center text-xs cursor-pointer">›</button>
+            </div>
+            <div class="pt-1">
+              <div id="floatTargetTitle" class="text-xs font-semibold text-center mb-1.5">Buraco Crítico</div>
+              <div class="grid grid-cols-4 gap-1" id="floatTargetBars"></div>
+            </div>
+          </aside>
+
+          <!-- CHASSIS DO SMARTPHONE -->
+          <div class="lumo-phone-frame rounded-[40px] p-2.5 w-full max-w-[366px] mx-auto">
+            <div class="lumo-screen rounded-[32px] overflow-hidden relative text-white flex flex-col">
+
+              <!-- Barra de Status iOS/Android + Notch -->
+              <div class="relative px-5 pt-2.5 pb-1 flex items-center justify-between text-[11px] font-semibold text-zinc-200 z-20">
+                <span>9:41</span>
+                <div class="w-24 h-4 bg-black rounded-b-xl border-x border-b border-white/10 flex items-center justify-center gap-1.5 -mt-2.5">
+                  <span class="w-8 h-1 rounded-full bg-zinc-800"></span>
+                  <span class="w-2 h-2 rounded-full bg-zinc-800 border border-sky-500/40"></span>
+                </div>
+                <div class="flex items-center gap-1.5 text-[10px]">
+                  <span>5G</span>
+                  <span class="inline-flex items-end gap-[1.5px] h-2.5">
+                    <span class="w-[2px] h-1 bg-white rounded-xs"></span>
+                    <span class="w-[2px] h-1.5 bg-white rounded-xs"></span>
+                    <span class="w-[2px] h-2 bg-white rounded-xs"></span>
+                    <span class="w-[2px] h-2.5 bg-white rounded-xs"></span>
+                  </span>
+                  <span class="w-4 h-2.5 rounded-[3px] border border-white/70 p-[1px] inline-flex items-center">
+                    <span class="w-full h-full bg-white rounded-[1px]"></span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Header Interno do App -->
+              <div class="px-3.5 py-1.5 flex items-center justify-between z-20">
+                <button id="phoneBackBtn" type="button" class="w-7 h-7 rounded-full lumo-glass-light flex items-center justify-center text-xs hover:bg-white/20 cursor-pointer" title="Alternar modo de câmera">
+                  ←
+                </button>
+                <div class="text-center">
+                  <div class="text-xs font-semibold tracking-wide text-zinc-100">UrbanScan • Câmera</div>
+                </div>
+                <button id="phoneHelpBtn" type="button" class="w-7 h-7 rounded-full lumo-glass-light flex items-center justify-center text-xs font-semibold hover:bg-white/20 cursor-pointer" title="Como usar">
+                  ?
+                </button>
+              </div>
+
+              <div id="phoneHelpBanner" class="hidden mx-3 mb-2 p-2.5 rounded-xl bg-amber-400/15 border border-amber-400/40 text-[11px] text-amber-100 leading-snug z-20">
+                <strong>Dica:</strong> Toque diretamente no buraco na tela ou no botão amarelo <strong>Tirar Foto</strong>. Ou mude para <strong>Auto-Scan</strong> e escolha <strong>Cabine</strong> / <strong>Moto</strong> para ver a IA detectando sozinha.
+              </div>
+
+              <!-- Cards Superiores -->
+              <div class="px-3 grid grid-cols-12 gap-2 z-20 mb-2">
+                <div class="col-span-8 lumo-glass rounded-2xl p-2.5 flex flex-col justify-between gap-2">
+                  <div class="flex items-center justify-between gap-1.5">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <div class="w-7 h-7 rounded-full lumo-yellow flex items-center justify-center shrink-0">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                          <circle cx="12" cy="13" r="4" />
+                        </svg>
+                      </div>
+                      <div class="min-w-0">
+                        <div id="phoneTripTitle" class="text-[11px] font-semibold truncate">Câmera Cidadão</div>
+                        <div id="phoneTripStreet" class="text-[10px] text-zinc-400 truncate">Av. Paulista, 1280</div>
+                      </div>
+                    </div>
+                    <div class="text-right shrink-0">
+                      <div id="phoneTripStatus" class="text-[10px] text-amber-300 font-semibold">Pronto</div>
+                      <div id="phoneTripSpeed" class="text-[10px] text-zinc-400 font-mono">0 km/h</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-white shrink-0"></span>
+                    <div class="flex-1 h-1.5 rounded-full bg-white/15 relative overflow-hidden">
+                      <div id="phoneRouteProgress" class="h-full bg-amber-400 rounded-full transition-all duration-300" style="width: 28%;"></div>
+                    </div>
+                    <svg class="w-3 h-3 text-zinc-400 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+                    </svg>
+                  </div>
+                </div>
+
+                <div class="col-span-4 lumo-glass rounded-2xl p-2 flex flex-col items-center justify-center relative">
+                  <svg class="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
+                    <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="4" />
+                    <circle id="iaRingArc" cx="28" cy="28" r="22" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="6" />
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span id="iaRingPct" class="text-xs font-bold font-mono leading-none">97%</span>
+                    <span class="text-[9px] text-zinc-400 mt-0.5">Edge IA</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- VISOR DA CÂMERA NO CELULAR -->
+              <div class="relative mx-3 rounded-2xl overflow-hidden border border-white/15 bg-black">
+                <canvas id="scannerCanvas" width="540" height="360" class="w-full h-auto block cursor-crosshair"></canvas>
+
+                <div class="absolute top-2 left-2 right-2 flex items-center justify-between gap-1 pointer-events-auto">
+                  <div class="inline-flex rounded-full p-0.5 bg-black/65 border border-white/15 backdrop-blur-md text-[10px]">
+                    <button data-cam="citizen" class="cam-mode-btn px-2 py-0.5 rounded-full font-semibold transition cursor-pointer">📸 Cidadão</button>
+                    <button data-cam="cabin" class="cam-mode-btn px-2 py-0.5 rounded-full font-medium transition cursor-pointer">🚘 Cabine</button>
+                    <button data-cam="moto" class="cam-mode-btn px-2 py-0.5 rounded-full font-medium transition cursor-pointer">🏍️ Moto</button>
+                  </div>
+
+                  <span id="hudFpsPill" class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-black/65 text-emerald-400 border border-emerald-500/35 backdrop-blur-md flex items-center gap-1 pointer-events-none">
+                    <span id="recDot" class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                    <span id="hudCamTag">FOTO IA</span>
+                  </span>
+                </div>
+
+                <div class="absolute bottom-2 inset-x-2 flex items-center justify-between gap-2 pointer-events-none">
+                  <div class="px-2 py-1 rounded-lg bg-black/65 border border-white/15 backdrop-blur-md text-[10px] text-zinc-200 pointer-events-auto">
+                    <span id="viewfinderHint">Toque na tela ou clique no obturador</span>
+                  </div>
+
+                  <button id="shutterBtn" type="button" class="pointer-events-auto group relative w-12 h-12 rounded-full bg-black/50 border-[3px] border-[#facc15] flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition cursor-pointer" title="Tirar Foto e Analisar com IA">
+                    <span class="w-8 h-8 rounded-full bg-white group-hover:bg-[#facc15] transition flex items-center justify-center text-slate-950">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                        <circle cx="12" cy="13" r="3.5" />
+                      </svg>
+                    </span>
+                  </button>
+                </div>
+
+                <div id="hudTelemetryToast" class="hidden absolute top-10 left-2 right-2 pointer-events-none">
+                  <div class="rounded-xl px-2.5 py-2 bg-emerald-950/90 border border-emerald-400/60 text-emerald-100 backdrop-blur-md shadow-lg text-[11px]">
+                    <div class="flex items-center justify-between gap-2">
+                      <span id="toastTitle" class="font-semibold truncate">✓ Foto analisada e enviada!</span>
+                      <span class="px-1.5 py-0.5 rounded bg-emerald-500/25 text-emerald-300 font-mono text-[9px] shrink-0">GPS + IA</span>
+                    </div>
+                    <div id="toastMeta" class="text-[10px] font-mono text-emerald-300/90 truncate mt-0.5"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- BENTO GRID 2x2 INFERIOR DENTRO DO CELULAR -->
+              <div class="p-3 grid grid-cols-2 gap-2 z-20">
+                <div class="lumo-glass rounded-2xl p-2.5 flex items-stretch justify-between gap-1.5">
+                  <div class="flex flex-col justify-between min-w-0">
+                    <div>
+                      <div class="text-[11px] font-semibold leading-tight">Gravidade</div>
+                      <div class="text-[9px] text-zinc-400">Índice de risco IA</div>
+                    </div>
+                    <div class="relative w-20 h-16 flex items-center justify-center mt-0.5">
+                      <svg class="w-20 h-16" viewBox="0 0 90 72">
+                        <g id="severityGaugeTicks"></g>
+                      </svg>
+                      <div class="absolute inset-0 flex flex-col items-center justify-center pt-1.5">
+                        <span id="phoneSeverityNum" class="text-lg font-bold font-mono leading-none">9.2</span>
+                        <span id="phoneSeverityText" class="text-[9px] font-semibold text-red-400 mt-0.5">CRÍTICO</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="w-8 rounded-full bg-white/[0.06] border border-white/10 p-0.5 flex flex-col items-center justify-between shrink-0">
+                    <button id="phonePlusBtn" type="button" class="w-7 h-7 rounded-full lumo-yellow flex items-center justify-center text-sm font-bold cursor-pointer" title="Injetar nova anomalia na pista">+</button>
+                    <button id="phoneMidActionBtn" type="button" class="text-[10px] text-zinc-300 hover:text-white cursor-pointer py-0.5" title="Alternar Auto-Scan">⚡</button>
+                    <button id="phoneMinusBtn" type="button" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm font-semibold cursor-pointer" title="Reduzir velocidade">−</button>
+                  </div>
+                </div>
+
+                <div class="lumo-glass rounded-2xl p-2.5 flex flex-col justify-between">
+                  <div class="flex items-start justify-between gap-1">
+                    <div>
+                      <div class="text-[11px] font-semibold leading-tight">Alvo na Via</div>
+                      <div class="text-[9px] text-zinc-400">Simular problema</div>
+                    </div>
+                    <button id="phoneSpawnShortcutBtn" type="button" class="w-6 h-6 rounded-full lumo-glass-light flex items-center justify-center text-[10px] hover:bg-white/20 cursor-pointer" title="Colocar este alvo na câmera">↗</button>
+                  </div>
+
+                  <div class="flex items-center justify-between gap-1 my-1">
+                    <button id="prevTargetBtn" type="button" class="w-6 h-6 rounded-full lumo-glass-light flex items-center justify-center text-xs hover:bg-white/20 cursor-pointer">‹</button>
+                    <div id="phoneTargetIconBox" class="flex items-center justify-center h-9"></div>
+                    <button id="nextTargetBtn" type="button" class="w-6 h-6 rounded-full bg-white text-slate-900 font-bold flex items-center justify-center text-xs hover:bg-zinc-200 cursor-pointer">›</button>
+                  </div>
+
+                  <div>
+                    <div id="phoneTargetLabel" class="text-[11px] font-semibold text-center mb-1">Buraco Crítico</div>
+                    <div id="phoneTargetBars" class="grid grid-cols-4 gap-1"></div>
+                  </div>
+                </div>
+
+                <div class="lumo-glass rounded-2xl p-2.5 flex flex-col justify-between">
+                  <div>
+                    <div class="text-[11px] font-semibold leading-tight">Telemetria GPS</div>
+                    <div id="phoneCoordsMini" class="text-[9px] font-mono text-zinc-400 mt-0.5 truncate">-23.5614, -46.6558</div>
+                  </div>
+                  <div class="mt-2 flex flex-col items-center">
+                    <div class="flex items-center justify-between w-full text-[9px] text-zinc-400 mb-1">
+                      <span>20 km/h</span>
+                      <span id="phoneSpeedReadout" class="text-amber-300 font-mono font-semibold">42 km/h</span>
+                      <span>80</span>
+                    </div>
+                    <input id="speedSlider" type="range" min="20" max="80" value="42" class="w-full h-1.5 accent-[#facc15] cursor-pointer" />
+                  </div>
+                </div>
+
+                <div class="lumo-glass rounded-2xl p-2.5 flex flex-col justify-between">
+                  <div class="flex items-center justify-between gap-1.5">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                      <img id="phoneLastSnap" src="" alt="Última captura" class="w-8 h-8 rounded-lg object-cover border border-white/15 bg-zinc-900 shrink-0" />
+                      <div class="min-w-0">
+                        <div id="phoneLastId" class="text-[10px] font-semibold truncate">#URB-104</div>
+                        <div id="phoneLastSub" class="text-[9px] text-emerald-400 truncate">Enviado GPS</div>
+                      </div>
+                    </div>
+                    <span class="text-[10px] text-zinc-400">↗</span>
+                  </div>
+
+                  <div class="flex items-center justify-around pt-1.5 text-zinc-200">
+                    <button id="phoneQuickInjectBtn" type="button" class="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-xs cursor-pointer" title="Novo problema à frente">⏮</button>
+                    <button id="playPauseBtn" type="button" class="w-7 h-7 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-xs cursor-pointer" title="Pausar/Retomar câmera">
+                      <span id="playPauseIcon">❚❚</span>
+                    </button>
+                    <button id="phoneQuickSnapBtn" type="button" class="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-xs cursor-pointer" title="Tirar Foto Agora">📸</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pb-2 pt-0.5 flex justify-center">
+                <div class="w-24 h-1 rounded-full bg-white/30"></div>
+              </div>
+            </div>
+          </div>
+
+          <aside id="floatingRightCard" class="hidden w-52 lumo-glass rounded-2xl p-3 text-white space-y-2.5 shrink-0 self-end mb-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs font-semibold">Última Evidência</div>
+                <div id="floatSnapMeta" class="text-[11px] text-zinc-400">Enviada à Prefeitura</div>
+              </div>
+              <span class="w-7 h-7 rounded-full lumo-yellow flex items-center justify-center text-xs font-bold">✓</span>
+            </div>
+            <img id="floatSnapImg" src="" alt="Última evidência enviada" class="w-full h-24 rounded-xl object-cover border border-white/15" />
+            <div class="text-[11px] flex items-center justify-between text-zinc-300">
+              <span id="floatSnapStreet" class="truncate">Av. Paulista</span>
+              <span id="floatSnapScore" class="font-mono font-bold text-amber-300 shrink-0 ml-1">9.2/10</span>
+            </div>
+          </aside>
+        </div>
+
+        <div class="relative z-10 mt-3 pt-2.5 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="font-semibold text-[#facc15]">Intelligence in every street.</div>
+          <div class="text-zinc-400 text-[11px]">
+            <span id="telemetryStreet" class="text-zinc-200 font-medium">Av. Paulista, 1280</span> • <span id="telemetryCoords" class="font-mono">-23.5614, -46.6558</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- MÓDULO 2: PAINEL DE CONTROLE DA PREFEITURA -->
+      <section id="dashboardSection" class="xl:col-span-7 space-y-4">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-3.5 shadow-sm">
+            <div class="text-xs text-[var(--muted-foreground)] font-medium">Detecções Recebidas</div>
+            <div class="mt-1 flex items-baseline justify-between gap-2">
+              <span id="kpiTotal" class="text-2xl font-bold font-mono tabular-nums">4</span>
+              <span id="kpiSessionDelta" class="badge-primary text-xs font-medium px-2 py-0.5 rounded-full">+0 ao vivo</span>
+            </div>
+            <div class="text-xs text-[var(--muted-foreground)] mt-1">Fotos &amp; vídeo contínuo IA</div>
+          </div>
+
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-3.5 shadow-sm">
+            <div class="text-xs text-[var(--muted-foreground)] font-medium">Críticas Pendentes</div>
+            <div class="mt-1 flex items-baseline justify-between gap-2">
+              <span id="kpiCritical" class="text-2xl font-bold font-mono tabular-nums text-[var(--error)]">1</span>
+              <span class="badge-critical text-xs font-medium px-2 py-0.5 rounded-full">Prioridade 1</span>
+            </div>
+            <div class="text-xs text-[var(--muted-foreground)] mt-1">Aguardando despacho OS</div>
+          </div>
+
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-3.5 shadow-sm">
+            <div class="text-xs text-[var(--muted-foreground)] font-medium">Vias Escaneadas</div>
+            <div class="mt-1 flex items-baseline justify-between gap-2">
+              <span id="kpiKm" class="text-2xl font-bold font-mono tabular-nums">14.8</span>
+              <span class="text-xs font-semibold text-[var(--success)]">km hoje</span>
+            </div>
+            <div class="text-xs text-[var(--muted-foreground)] mt-1">Cidadãos + Frota ativa</div>
+          </div>
+
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-3.5 shadow-sm">
+            <div class="text-xs text-[var(--muted-foreground)] font-medium">Precisão Média IA</div>
+            <div class="mt-1 flex items-baseline justify-between gap-2">
+              <span id="kpiAccuracy" class="text-2xl font-bold font-mono tabular-nums">96.8%</span>
+              <span class="badge-success text-xs font-medium px-2 py-0.5 rounded-full">Validado</span>
+            </div>
+            <div class="text-xs text-[var(--muted-foreground)] mt-1">Classificação automática</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <div class="lg:col-span-7 bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden shadow-sm flex flex-col">
+            <div class="px-3.5 py-2.5 border-b border-[var(--card-border)] flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 class="text-sm font-bold">Mapa de Zeladoria Georreferenciado</h3>
+                <p class="text-xs text-[var(--muted-foreground)]">Toda foto ou detecção do app aparece aqui em tempo real</p>
+              </div>
+              <div class="flex items-center gap-2 text-xs">
+                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[var(--error)]"></span> Crítico</span>
+                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[var(--warning)]"></span> Alto/Mod.</span>
+                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[var(--success)]"></span> OS Ativa</span>
+              </div>
+            </div>
+            <div class="relative flex-1 min-h-[270px]">
+              <canvas id="mapCanvas" width="640" height="380" class="w-full h-full block cursor-default"></canvas>
+              <div id="mapHoverTooltip" class="hidden pointer-events-none absolute px-2.5 py-1.5 rounded-lg text-xs shadow-lg border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] z-10"></div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden shadow-sm flex flex-col">
+            <div class="px-3.5 py-2.5 border-b border-[var(--card-border)] flex items-center justify-between gap-2">
+              <h3 class="text-sm font-bold">Evidência Recebida pela IA</h3>
+              <span id="detailIdBadge" class="text-xs font-mono text-[var(--muted-foreground)]">#URB-104</span>
+            </div>
+
+            <div id="detailPanelBody" class="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden shadow-sm">
+          <div class="p-3.5 border-b border-[var(--card-border)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h3 class="text-sm font-bold">Fila de Ocorrências — Painel Municipal</h3>
+              <p class="text-xs text-[var(--muted-foreground)]">Recebimento imediato de fotos do cidadão e varreduras automáticas</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="flex flex-wrap gap-1" id="categoryFilterGroup">
+                <button data-cat="ALL" class="cat-filter-btn text-xs font-medium px-2.5 py-1 rounded-md border transition cursor-pointer">Todos</button>
+                <button data-cat="POTHOLE" class="cat-filter-btn text-xs font-medium px-2.5 py-1 rounded-md border transition cursor-pointer">Buracos</button>
+                <button data-cat="CRACK" class="cat-filter-btn text-xs font-medium px-2.5 py-1 rounded-md border transition cursor-pointer">Rachaduras</button>
+                <button data-cat="CROSSWALK" class="cat-filter-btn text-xs font-medium px-2.5 py-1 rounded-md border transition cursor-pointer">Faixa Pedestre</button>
+                <button data-cat="WASTE" class="cat-filter-btn text-xs font-medium px-2.5 py-1 rounded-md border transition cursor-pointer">Lixo</button>
+              </div>
+
+              <select id="severityFilterSelect" class="text-xs rounded-md border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] px-2 py-1">
+                <option value="ALL">Gravidade: Todas</option>
+                <option value="CRÍTICO">Crítico</option>
+                <option value="ALTO">Alto</option>
+                <option value="MODERADO">Moderado</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="incidentQueueList" class="divide-y divide-[var(--card-border)] max-h-[340px] overflow-y-auto custom-scroll">
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const TARGET_ORDER = ['POTHOLE', 'CRACK', 'CROSSWALK', 'WASTE'];
+
+      const ANOMALY_META = {
+        POTHOLE: {
+          code: 'POTHOLE',
+          label: 'Buraco na Via',
+          shortLabel: 'Buraco Crítico',
+          severity: 'CRÍTICO',
+          scoreRange: [8.5, 9.8],
+          confRange: [0.95, 0.99],
+          laneXRange: [-0.32, 0.32],
+          metrics: ['Ø 68cm • Prof. ~9cm', 'Ø 84cm • Prof. ~12cm', 'Ø 55cm • Borda Instável']
+        },
+        CRACK: {
+          code: 'CRACK',
+          label: 'Rachadura no Asfalto',
+          shortLabel: 'Rachadura',
+          severity: 'MODERADO',
+          scoreRange: [5.5, 7.1],
+          confRange: [0.92, 0.97],
+          laneXRange: [-0.28, 0.28],
+          metrics: ['Rede 2.4m • Fissura Grau 3', 'Trinca Couro de Jacaré • 1.9m', 'Fissura Longitudinal • 3.1m']
+        },
+        CROSSWALK: {
+          code: 'CROSSWALK',
+          label: 'Falta de Faixa de Pedestre',
+          shortLabel: 'Sem Faixa',
+          severity: 'ALTO',
+          scoreRange: [7.4, 8.6],
+          confRange: [0.93, 0.98],
+          laneXRange: [0.0, 0.0],
+          metrics: ['Desgaste 82% • Risco Pedestre', 'Contraste < 15% • Repintura', 'Faixa Apagada • Travessia']
+        },
+        WASTE: {
+          code: 'WASTE',
+          label: 'Lixo Acumulado',
+          shortLabel: 'Lixo Acumulado',
+          severity: 'ALTO',
+          scoreRange: [6.9, 8.3],
+          confRange: [0.92, 0.97],
+          laneXRange: [0.64, 0.74],
+          metrics: ['Vol. ~1.2m³ • Obstrução Bordo', 'Descarte Irregular • Calçada', 'Entulho 0.9m³ • Drenagem']
+        }
+      };
+
+      const CAM_PROFILES = {
+        citizen: {
+          id: 'citizen',
+          title: 'Câmera Cidadão',
+          hudTag: 'FOTO CIDADÃO',
+          defaultSpeed: 24,
+          swayAmp: 0.008,
+          sourceLabel: 'App Celular (Foto Cidadão + IA)'
+        },
+        cabin: {
+          id: 'cabin',
+          title: 'Scanner Painel Carro',
+          hudTag: 'CABINE • 60 FPS',
+          defaultSpeed: 54,
+          swayAmp: 0.010,
+          sourceLabel: 'Celular no Painel / Cabine Frota'
+        },
+        moto: {
+          id: 'moto',
+          title: 'Moto Capacete',
+          hudTag: 'MOTO • ESTAB. IA',
+          defaultSpeed: 46,
+          swayAmp: 0.025,
+          sourceLabel: 'Moto Scanner (Delivery / Trânsito)'
+        }
+      };
+
+      const ROUTE_WAYPOINTS = [
+        { x: 96, y: 92, street: 'Av. Paulista', district: 'Bela Vista' },
+        { x: 544, y: 92, street: 'Av. Brigadeiro Luís Antônio', district: 'Jardim Paulista' },
+        { x: 544, y: 294, street: 'Av. 9 de Julho', district: 'Itaim / Jardins' },
+        { x: 96, y: 294, street: 'Rua Augusta', district: 'Consolação' }
+      ];
+
+      const state = {
+        viewMode: 'split',
+        cameraMode: 'citizen',
+        autoScan: false,
+        speedKmh: 24,
+        isPlaying: true,
+        showComparison: true,
+        selectedTargetIdx: 0,
+        routeProgress: 0.10,
+        kmScanned: 14.82,
+        roadOffset: 0,
+        timeSec: 0,
+        anomaliesOnRoad: [],
+        incidents: [],
+        selectedIncidentId: null,
+        filterCategory: 'ALL',
+        filterSeverity: 'ALL',
+        nextSeq: 105,
+        sessionDetections: 0,
+        autoSpawnTimer: 1.5,
+        toastTimer: 0,
+        shutterFlash: 0,
+        photoFreezeTimer: 0,
+        focusNormalized: { x: 0.5, y: 0.58 },
+        mapPulses: [],
+        hoveredPinId: null,
+        pinHitBoxes: []
+      };
+
+      const scannerCanvas = document.getElementById('scannerCanvas');
+      const sCtx = scannerCanvas.getContext('2d');
+      const mapCanvas = document.getElementById('mapCanvas');
+      const mCtx = mapCanvas.getContext('2d');
+
+      const themeToggleBtn = document.getElementById('themeToggleBtn');
+      const themeIcon = document.getElementById('themeIcon');
+      const comparisonBanner = document.getElementById('comparisonBanner');
+      const toggleCompareBtn = document.getElementById('toggleCompareBtn');
+      const compareBtnText = document.getElementById('compareBtnText');
+      const scannerSection = document.getElementById('scannerSection');
+      const dashboardSection = document.getElementById('dashboardSection');
+      const floatingLeftCard = document.getElementById('floatingLeftCard');
+      const floatingRightCard = document.getElementById('floatingRightCard');
+
+      const modeManualBtn = document.getElementById('modeManualBtn');
+      const modeAutoBtn = document.getElementById('modeAutoBtn');
+      const phoneHelpBtn = document.getElementById('phoneHelpBtn');
+      const phoneHelpBanner = document.getElementById('phoneHelpBanner');
+      const phoneBackBtn = document.getElementById('phoneBackBtn');
+
+      const phoneTripTitle = document.getElementById('phoneTripTitle');
+      const phoneTripStreet = document.getElementById('phoneTripStreet');
+      const phoneTripStatus = document.getElementById('phoneTripStatus');
+      const phoneTripSpeed = document.getElementById('phoneTripSpeed');
+      const phoneRouteProgress = document.getElementById('phoneRouteProgress');
+      const iaRingArc = document.getElementById('iaRingArc');
+      const iaRingPct = document.getElementById('iaRingPct');
+
+      const hudCamTag = document.getElementById('hudCamTag');
+      const recDot = document.getElementById('recDot');
+      const viewfinderHint = document.getElementById('viewfinderHint');
+      const shutterBtn = document.getElementById('shutterBtn');
+      const hudTelemetryToast = document.getElementById('hudTelemetryToast');
+      const toastTitle = document.getElementById('toastTitle');
+      const toastMeta = document.getElementById('toastMeta');
+
+      const severityGaugeTicks = document.getElementById('severityGaugeTicks');
+      const phoneSeverityNum = document.getElementById('phoneSeverityNum');
+      const phoneSeverityText = document.getElementById('phoneSeverityText');
+      const phonePlusBtn = document.getElementById('phonePlusBtn');
+      const phoneMidActionBtn = document.getElementById('phoneMidActionBtn');
+      const phoneMinusBtn = document.getElementById('phoneMinusBtn');
+
+      const prevTargetBtn = document.getElementById('prevTargetBtn');
+      const nextTargetBtn = document.getElementById('nextTargetBtn');
+      const phoneSpawnShortcutBtn = document.getElementById('phoneSpawnShortcutBtn');
+      const phoneTargetIconBox = document.getElementById('phoneTargetIconBox');
+      const phoneTargetLabel = document.getElementById('phoneTargetLabel');
+      const phoneTargetBars = document.getElementById('phoneTargetBars');
+
+      const floatPrevTarget = document.getElementById('floatPrevTarget');
+      const floatNextTarget = document.getElementById('floatNextTarget');
+      const floatSpawnBtn = document.getElementById('floatSpawnBtn');
+      const floatTargetPreview = document.getElementById('floatTargetPreview');
+      const floatTargetTitle = document.getElementById('floatTargetTitle');
+      const floatTargetBars = document.getElementById('floatTargetBars');
+      const floatSnapImg = document.getElementById('floatSnapImg');
+      const floatSnapStreet = document.getElementById('floatSnapStreet');
+      const floatSnapScore = document.getElementById('floatSnapScore');
+
+      const phoneCoordsMini = document.getElementById('phoneCoordsMini');
+      const phoneSpeedReadout = document.getElementById('phoneSpeedReadout');
+      const speedSlider = document.getElementById('speedSlider');
+
+      const phoneLastSnap = document.getElementById('phoneLastSnap');
+      const phoneLastId = document.getElementById('phoneLastId');
+      const phoneLastSub = document.getElementById('phoneLastSub');
+      const phoneQuickInjectBtn = document.getElementById('phoneQuickInjectBtn');
+      const playPauseBtn = document.getElementById('playPauseBtn');
+      const playPauseIcon = document.getElementById('playPauseIcon');
+      const phoneQuickSnapBtn = document.getElementById('phoneQuickSnapBtn');
+
+      const telemetryStreet = document.getElementById('telemetryStreet');
+      const telemetryCoords = document.getElementById('telemetryCoords');
+
+      const kpiTotal = document.getElementById('kpiTotal');
+      const kpiSessionDelta = document.getElementById('kpiSessionDelta');
+      const kpiCritical = document.getElementById('kpiCritical');
+      const kpiKm = document.getElementById('kpiKm');
+      const kpiAccuracy = document.getElementById('kpiAccuracy');
+
+      const detailIdBadge = document.getElementById('detailIdBadge');
+      const detailPanelBody = document.getElementById('detailPanelBody');
+      const incidentQueueList = document.getElementById('incidentQueueList');
+      const severityFilterSelect = document.getElementById('severityFilterSelect');
+      const mapHoverTooltip = document.getElementById('mapHoverTooltip');
+
+      function readCssVar(name, fallback) {
+        const val = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        return val || fallback;
+      }
+
+      function getThemeColors() {
+        const isLight = document.documentElement.classList.contains('light');
+        return {
+          isLight,
+          background: readCssVar('--background', isLight ? '#f1f5f9' : '#0b1120'),
+          card: readCssVar('--card', isLight ? '#ffffff' : '#111827'),
+          content: readCssVar('--content', isLight ? '#e2e8f0' : '#0f172a'),
+          border: readCssVar('--border', isLight ? '#cbd5e1' : '#334155'),
+          foreground: readCssVar('--foreground', isLight ? '#0f172a' : '#f8fafc'),
+          muted: readCssVar('--muted-foreground', isLight ? '#64748b' : '#94a3b8'),
+          primary: readCssVar('--primary', '#3b82f6'),
+          success: readCssVar('--success', '#22c55e'),
+          warning: readCssVar('--warning', '#f59e0b'),
+          error: readCssVar('--error', '#ef4444'),
+          accent: readCssVar('--accent', '#06b6d4')
+        };
+      }
+
+      let themeColors = getThemeColors();
+      window.addEventListener('themechange', () => {
+        themeColors = getThemeColors();
+        drawMap();
+      });
+
+      themeToggleBtn.addEventListener('click', () => {
+        document.documentElement.classList.toggle('light');
+        const isLight = document.documentElement.classList.contains('light');
+        themeIcon.textContent = isLight ? '🌙' : '☀️';
+        themeColors = getThemeColors();
+        drawMap();
+      });
+
+      function randBetween(min, max) {
+        return min + Math.random() * (max - min);
+      }
+
+      function pickRandom(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+      }
+
+      function getCurrentTargetType() {
+        return TARGET_ORDER[state.selectedTargetIdx];
+      }
+
+      function getRoutePoint(progress) {
+        const p = ((progress % 1) + 1) % 1;
+        const segFloat = p * ROUTE_WAYPOINTS.length;
+        const segIdx = Math.floor(segFloat);
+        const segT = segFloat - segIdx;
+        const a = ROUTE_WAYPOINTS[segIdx];
+        const b = ROUTE_WAYPOINTS[(segIdx + 1) % ROUTE_WAYPOINTS.length];
+
+        const x = a.x + (b.x - a.x) * segT;
+        const y = a.y + (b.y - a.y) * segT;
+        const angle = Math.atan2(b.y - a.y, b.x - a.x);
+        const lat = -23.5565 - (y / 380) * 0.0145;
+        const lng = -46.6645 + (x / 640) * 0.0185;
+        const streetNum = 200 + Math.floor(segT * 1800);
+
+        return {
+          x,
+          y,
+          angle,
+          street: `${a.street}, ${streetNum}`,
+          streetShort: a.street,
+          district: a.district,
+          lat,
+          lng
+        };
+      }
+
+      function severityColor(severity) {
+        if (severity === 'CRÍTICO') return themeColors.error;
+        if (severity === 'ALTO') return themeColors.warning;
+        return themeColors.accent;
+      }
+
+      function severityBadgeClass(severity) {
+        if (severity === 'CRÍTICO') return 'badge-critical';
+        if (severity === 'ALTO') return 'badge-high';
+        return 'badge-moderate';
+      }
+
+      function formatTimeAgo(createdAtMs) {
+        const sec = Math.max(0, Math.floor((Date.now() - createdAtMs) / 1000));
+        if (sec < 5) return 'agora mesmo';
+        if (sec < 60) return `há ${sec}s`;
+        const min = Math.floor(sec / 60);
+        return `há ${min} min`;
+      }
+
+      function getTargetSvg(type) {
+        if (type === 'POTHOLE') {
+          return `<svg class="w-8 h-8" viewBox="0 0 36 36" fill="none">
+            <ellipse cx="18" cy="20" rx="13" ry="7.5" fill="#1e293b" stroke="#ef4444" stroke-width="1.8"/>
+            <ellipse cx="18" cy="21" rx="9" ry="4.5" fill="#05070c"/>
+            <circle cx="11" cy="15" r="1.4" fill="#94a3b8"/>
+            <circle cx="25" cy="14" r="1.2" fill="#94a3b8"/>
+          </svg>`;
+        }
+        if (type === 'CRACK') {
+          return `<svg class="w-8 h-8" viewBox="0 0 36 36" fill="none">
+            <path d="M5 14 L13 18 L18 15 L24 22 L31 19" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M13 18 L10 26 M18 15 L21 9" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>`;
+        }
+        if (type === 'CROSSWALK') {
+          return `<svg class="w-8 h-8" viewBox="0 0 36 36" fill="none">
+            <rect x="4" y="13" width="5" height="12" rx="1" fill="#f59e0b" opacity="0.85"/>
+            <rect x="12" y="13" width="5" height="12" rx="1" stroke="#f59e0b" stroke-dasharray="2 2" opacity="0.5"/>
+            <rect x="20" y="13" width="5" height="12" rx="1" fill="#f59e0b" opacity="0.4"/>
+            <rect x="28" y="13" width="5" height="12" rx="1" fill="#f59e0b" opacity="0.85"/>
+          </svg>`;
+        }
+        return `<svg class="w-8 h-8" viewBox="0 0 36 36" fill="none">
+          <ellipse cx="13" cy="23" rx="6" ry="5" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+          <ellipse cx="22" cy="24" rx="7" ry="5" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5"/>
+          <rect x="15" y="12" width="8" height="7" rx="1" fill="#ca8a04"/>
+        </svg>`;
+      }
+
+      function renderRoadScene(ctx, W, H, anomaliesList, tSec, roadOffset, cameraMode, options = {}) {
+        const isCitizen = cameraMode === 'citizen';
+        const isCabin = cameraMode === 'cabin';
+        const isMoto = cameraMode === 'moto';
+
+        const profile = CAM_PROFILES[cameraMode] || CAM_PROFILES.citizen;
+        const horizonY = isCitizen ? H * 0.17 : H * 0.34;
+        const swayAmp = state.autoScan ? profile.swayAmp : 0.004;
+        const swayX = Math.sin(tSec * 2.0) * W * swayAmp;
+        const vpX = W * 0.5 + swayX;
+
+        ctx.save();
+        if (isMoto && state.autoScan) {
+          const tilt = Math.sin(tSec * 1.7) * 0.022;
+          ctx.translate(W * 0.5, H * 0.5);
+          ctx.rotate(tilt);
+          ctx.translate(-W * 0.5, -H * 0.5);
+        }
+
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, horizonY);
+        skyGrad.addColorStop(0, '#0a1524');
+        skyGrad.addColorStop(0.65, '#1b314a');
+        skyGrad.addColorStop(1, '#314b68');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(-20, -20, W + 40, horizonY + 24);
+
+        const sunGrad = ctx.createRadialGradient(vpX + 36, horizonY - 8, 4, vpX + 36, horizonY - 8, 95);
+        sunGrad.addColorStop(0, 'rgba(253, 224, 141, 0.28)');
+        sunGrad.addColorStop(1, 'rgba(253, 224, 141, 0)');
+        ctx.fillStyle = sunGrad;
+        ctx.fillRect(0, 0, W, horizonY + 2);
+
+        const buildings = [
+          [0.02, 0.14, 0.08], [0.10, 0.09, 0.10], [0.22, 0.16, 0.07],
+          [0.31, 0.11, 0.09], [0.58, 0.15, 0.07], [0.66, 0.08, 0.11],
+          [0.78, 0.13, 0.08], [0.88, 0.10, 0.09]
+        ];
+        ctx.fillStyle = '#111c2d';
+        for (const [bx, by, bw] of buildings) {
+          const rx = bx * W + swayX * 0.2;
+          const ry = isCitizen ? by * H * 0.65 : by * H * 1.4;
+          if (ry < horizonY) {
+            ctx.fillRect(rx, ry, bw * W, horizonY - ry + 1);
+          }
+        }
+
+        ctx.fillStyle = '#1f2937';
+        ctx.fillRect(-20, horizonY, W + 40, H - horizonY + 30);
+
+        const roadTopHalf = isCitizen ? W * 0.13 : W * 0.07;
+        const roadBotHalf = isCitizen ? W * 0.56 : W * 0.44;
+
+        ctx.fillStyle = '#334155';
+        ctx.beginPath();
+        ctx.moveTo(0, horizonY);
+        ctx.lineTo(vpX - roadTopHalf, horizonY);
+        ctx.lineTo(W * 0.5 - roadBotHalf, H);
+        ctx.lineTo(0, H);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(vpX + roadTopHalf, horizonY);
+        ctx.lineTo(W, horizonY);
+        ctx.lineTo(W, H);
+        ctx.lineTo(W * 0.5 + roadBotHalf, H);
+        ctx.closePath();
+        ctx.fill();
+
+        const roadGrad = ctx.createLinearGradient(0, horizonY, 0, H);
+        roadGrad.addColorStop(0, '#1e2430');
+        roadGrad.addColorStop(0.5, '#272f3e');
+        roadGrad.addColorStop(1, '#1a202b');
+        ctx.fillStyle = roadGrad;
+        ctx.beginPath();
+        ctx.moveTo(vpX - roadTopHalf, horizonY);
+        ctx.lineTo(vpX + roadTopHalf, horizonY);
+        ctx.lineTo(W * 0.5 + roadBotHalf, H);
+        ctx.lineTo(W * 0.5 - roadBotHalf, H);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(vpX - roadTopHalf, horizonY);
+        ctx.lineTo(W * 0.5 - roadBotHalf, H);
+        ctx.moveTo(vpX + roadTopHalf, horizonY);
+        ctx.lineTo(W * 0.5 + roadBotHalf, H);
+        ctx.stroke();
+
+        function project(laneX, z) {
+          const k = isCitizen ? 0.34 : 0.28;
+          const minV = k / (1 + k);
+          const p = Math.max(0, Math.min(1.18, (k / (z + k) - minV) / (1 - minV)));
+          const y = horizonY + (H - horizonY) * p;
+          const halfW = roadTopHalf + (roadBotHalf - roadTopHalf) * p;
+          const x = vpX + laneX * halfW;
+          const scale = (isCitizen ? 0.24 : 0.16) + p * 0.85;
+          return { x, y, p, halfW, scale };
+        }
+
+        const numSegments = 9;
+        for (let i = 0; i < numSegments; i++) {
+          const zStart = ((i / numSegments) - (roadOffset % (1 / numSegments)) + 1) % 1;
+          const zEnd = zStart + 0.045;
+          if (zEnd > 0.99) continue;
+          const p1 = project(0, zStart);
+          const p2 = project(0, zEnd);
+          ctx.strokeStyle = 'rgba(250, 204, 21, 0.78)';
+          ctx.lineWidth = Math.max(1.5, 5.5 * p1.scale);
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+        }
+
+        const sorted = [...anomaliesList].sort((a, b) => b.z - a.z);
+        for (const item of sorted) {
+          const pt = project(item.laneX, item.z);
+          const s = pt.scale * (isCitizen ? 1.15 : 0.95);
+          let boxW = 86 * s;
+          let boxH = 52 * s;
+          let boxX = pt.x - boxW / 2;
+          let boxY = pt.y - boxH / 2;
+
+          if (item.type === 'POTHOLE') {
+            const rx = 50 * s;
+            const ry = 21 * s;
+            ctx.fillStyle = '#3f4756';
+            ctx.beginPath();
+            ctx.ellipse(pt.x, pt.y, rx * 1.18, ry * 1.24, 0.05, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#070a10';
+            ctx.beginPath();
+            ctx.ellipse(pt.x, pt.y + 2 * s, rx, ry, -0.05, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = Math.max(1, 2 * s);
+            ctx.beginPath();
+            ctx.ellipse(pt.x, pt.y + 1 * s, rx * 0.85, ry * 0.72, 0, 0.2, Math.PI * 1.15);
+            ctx.stroke();
+
+            boxW = rx * 2.5;
+            boxH = ry * 3.0;
+            boxX = pt.x - boxW / 2;
+            boxY = pt.y - boxH / 2;
+          } else if (item.type === 'CRACK') {
+            ctx.save();
+            ctx.translate(pt.x, pt.y);
+            ctx.scale(s, s);
+            ctx.strokeStyle = '#070a11';
+            ctx.lineWidth = 3.2;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(-58, -14);
+            ctx.lineTo(-24, -4);
+            ctx.lineTo(-4, 7);
+            ctx.lineTo(26, -3);
+            ctx.lineTo(60, 14);
+            ctx.moveTo(-24, -4);
+            ctx.lineTo(-38, 16);
+            ctx.moveTo(-4, 7);
+            ctx.lineTo(12, 22);
+            ctx.moveTo(26, -3);
+            ctx.lineTo(42, -16);
+            ctx.stroke();
+            ctx.strokeStyle = 'rgba(148,163,184,0.35)';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+            ctx.restore();
+
+            boxW = 138 * s;
+            boxH = 56 * s;
+            boxX = pt.x - boxW / 2;
+            boxY = pt.y - boxH / 2;
+          } else if (item.type === 'CROSSWALK') {
+            const roadSpan = pt.halfW * 1.66;
+            const stripes = 6;
+            const barH = 24 * s;
+            for (let k = 0; k < stripes; k++) {
+              const frac = -0.82 + (k / (stripes - 1)) * 1.64;
+              const bx = vpX + frac * pt.halfW;
+              const bw = (roadSpan / stripes) * 0.56;
+              if (k === 1 || k === 3) continue;
+              ctx.fillStyle = k === 2 ? 'rgba(226, 232, 240, 0.17)' : 'rgba(226, 232, 240, 0.32)';
+              ctx.beginPath();
+              ctx.moveTo(bx - bw * 0.45, pt.y - barH * 0.5);
+              ctx.lineTo(bx + bw * 0.45, pt.y - barH * 0.5);
+              ctx.lineTo(bx + bw * 0.55, pt.y + barH * 0.5);
+              ctx.lineTo(bx - bw * 0.55, pt.y + barH * 0.5);
+              ctx.closePath();
+              ctx.fill();
+            }
+            boxW = pt.halfW * 1.72;
+            boxH = barH * 2.0;
+            boxX = vpX - boxW / 2;
+            boxY = pt.y - boxH / 2;
+          } else if (item.type === 'WASTE') {
+            ctx.save();
+            ctx.translate(pt.x, pt.y);
+            ctx.scale(s, s);
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.ellipse(-18, 4, 21, 15, -0.1, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.ellipse(10, 7, 23, 16, 0.15, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#a16207';
+            ctx.fillRect(-10, -20, 26, 18);
+            ctx.strokeStyle = '#eab308';
+            ctx.lineWidth = 1.4;
+            ctx.strokeRect(-10, -20, 26, 18);
+            ctx.restore();
+
+            boxW = 98 * s;
+            boxH = 62 * s;
+            boxX = pt.x - boxW / 2;
+            boxY = pt.y - boxH / 2 - 4 * s;
+          }
+
+          if (item.z < 0.92 && item.z > 0.03) {
+            const meta = ANOMALY_META[item.type];
+            const color = item.transmitted
+              ? '#22c55e'
+              : (meta.severity === 'CRÍTICO' ? '#ef4444' : meta.severity === 'ALTO' ? '#facc15' : '#38bdf8');
+
+            ctx.fillStyle = item.transmitted
+              ? 'rgba(34, 197, 94, 0.14)'
+              : (meta.severity === 'CRÍTICO' ? 'rgba(239, 68, 68, 0.13)' : 'rgba(250, 204, 21, 0.12)');
+            ctx.fillRect(boxX, boxY, boxW, boxH);
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.4;
+            ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+            const cLen = Math.max(8, Math.min(18, boxW * 0.22));
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(boxX, boxY + cLen); ctx.lineTo(boxX, boxY); ctx.lineTo(boxX + cLen, boxY);
+            ctx.moveTo(boxX + boxW - cLen, boxY); ctx.lineTo(boxX + boxW, boxY); ctx.lineTo(boxX + boxW, boxY + cLen);
+            ctx.moveTo(boxX, boxY + boxH - cLen); ctx.lineTo(boxX, boxY + boxH); ctx.lineTo(boxX + cLen, boxY + boxH);
+            ctx.moveTo(boxX + boxW - cLen, boxY + boxH); ctx.lineTo(boxX + boxW, boxY + boxH); ctx.lineTo(boxX + boxW, boxY + boxH - cLen);
+            ctx.stroke();
+
+            if (item.z < 0.84) {
+              const confPct = Math.round(item.confidence * 100);
+              const tagText = `${meta.shortLabel.toUpperCase()} ${confPct}% • ${meta.severity}`;
+              const subText = item.transmitted ? `✓ ENVIADO GPS • ${item.metric}` : `ALVO DETECTADO • ${item.metric}`;
+
+              ctx.font = 'bold 10px ui-monospace, SFMono-Regular, Menlo, monospace';
+              const tw1 = ctx.measureText(tagText).width;
+              ctx.font = '9.5px ui-monospace, SFMono-Regular, Menlo, monospace';
+              const tw2 = ctx.measureText(subText).width;
+              const labelW = Math.max(tw1, tw2) + 14;
+              const labelH = 29;
+              const lx = Math.max(10, Math.min(W - labelW - 10, boxX));
+              const ly = Math.max(36, boxY - labelH - 4);
+
+              ctx.fillStyle = 'rgba(7, 10, 16, 0.88)';
+              ctx.fillRect(lx, ly, labelW, labelH);
+              ctx.fillStyle = color;
+              ctx.fillRect(lx, ly, 3.5, labelH);
+
+              ctx.fillStyle = '#f8fafc';
+              ctx.font = 'bold 10px ui-monospace, SFMono-Regular, Menlo, monospace';
+              ctx.fillText(tagText, lx + 8, ly + 12);
+
+              ctx.fillStyle = item.transmitted ? '#4ade80' : '#fde047';
+              ctx.font = '9.5px ui-monospace, SFMono-Regular, Menlo, monospace';
+              ctx.fillText(subText, lx + 8, ly + 24);
+            }
+          }
+        }
+
+        if (options.includeForeground !== false) {
+          if (isCabin) {
+            ctx.fillStyle = '#090c11';
+            ctx.beginPath();
+            ctx.moveTo(0, 0); ctx.lineTo(W * 0.15, 0); ctx.lineTo(W * 0.05, H * 0.78); ctx.lineTo(0, H * 0.78); ctx.closePath();
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(W, 0); ctx.lineTo(W * 0.85, 0); ctx.lineTo(W * 0.95, H * 0.78); ctx.lineTo(W, H * 0.78); ctx.closePath();
+            ctx.fill();
+
+            ctx.fillRect(0, 0, W, 16);
+            ctx.fillStyle = '#111622';
+            ctx.fillRect(W * 0.43, 14, W * 0.14, 18);
+
+            ctx.fillStyle = '#0a0d14';
+            ctx.beginPath();
+            ctx.moveTo(0, H * 0.75);
+            ctx.quadraticCurveTo(W * 0.5, H * 0.67, W, H * 0.75);
+            ctx.lineTo(W, H);
+            ctx.lineTo(0, H);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = '#182438';
+            ctx.fillRect(W * 0.41, H * 0.74, W * 0.18, H * 0.12);
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.55)';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(W * 0.41, H * 0.74, W * 0.18, H * 0.12);
+            ctx.fillStyle = '#facc15';
+            ctx.font = 'bold 8px sans-serif';
+            ctx.fillText('SCANNER ON', W * 0.435, H * 0.81);
+
+            ctx.fillStyle = '#11151e';
+            ctx.beginPath();
+            ctx.moveTo(0, H); ctx.lineTo(0, H * 0.50); ctx.quadraticCurveTo(W * 0.13, H * 0.52, W * 0.14, H); ctx.closePath();
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(W, H); ctx.lineTo(W, H * 0.50); ctx.quadraticCurveTo(W * 0.87, H * 0.52, W * 0.86, H); ctx.closePath();
+            ctx.fill();
+          } else if (isMoto) {
+            ctx.fillStyle = 'rgba(9, 12, 18, 0.85)';
+            ctx.beginPath();
+            ctx.moveTo(0, H);
+            ctx.lineTo(0, H * 0.84);
+            ctx.quadraticCurveTo(W * 0.5, H * 0.76, W, H * 0.84);
+            ctx.lineTo(W, H);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.35)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          } else if (isCitizen) {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(W / 3, 0); ctx.lineTo(W / 3, H);
+            ctx.moveTo((W * 2) / 3, 0); ctx.lineTo((W * 2) / 3, H);
+            ctx.moveTo(0, H / 3); ctx.lineTo(W, H / 3);
+            ctx.moveTo(0, (H * 2) / 3); ctx.lineTo(W, (H * 2) / 3);
+            ctx.stroke();
+
+            const fx = state.focusNormalized.x * W;
+            const fy = state.focusNormalized.y * H;
+            const fr = 24;
+            ctx.strokeStyle = '#facc15';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(fx - fr, fy - fr + 8); ctx.lineTo(fx - fr, fy - fr); ctx.lineTo(fx - fr + 8, fy - fr);
+            ctx.moveTo(fx + fr - 8, fy - fr); ctx.lineTo(fx + fr, fy - fr); ctx.lineTo(fx + fr, fy - fr + 8);
+            ctx.moveTo(fx - fr, fy + fr - 8); ctx.lineTo(fx - fr, fy + fr); ctx.lineTo(fx - fr + 8, fy + fr);
+            ctx.moveTo(fx + fr - 8, fy + fr); ctx.lineTo(fx + fr, fy + fr); ctx.lineTo(fx + fr, fy + fr - 8);
+            ctx.stroke();
+          }
+        }
+
+        ctx.restore();
+
+        if (options.includeFlash !== false && state.shutterFlash > 0) {
+          ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(0.85, state.shutterFlash)})`;
+          ctx.fillRect(0, 0, W, H);
+        }
+      }
+
+      function generateSnapshotDataUrl(type, confidence, metric) {
+        const off = document.createElement('canvas');
+        off.width = 320;
+        off.height = 200;
+        const oCtx = off.getContext('2d');
+        const fakeItem = {
+          type,
+          laneX: type === 'WASTE' ? 0.68 : type === 'CROSSWALK' ? 0 : 0.05,
+          z: 0.36,
+          confidence,
+          metric,
+          transmitted: true
+        };
+        renderRoadScene(oCtx, off.width, off.height, [fakeItem], 1.2, 0.2, 'citizen', { includeForeground: false, includeFlash: false });
+        return off.toDataURL('image/png');
+      }
+
+      function seedInitialIncidents() {
+        const seeds = [
+          {
+            type: 'POTHOLE',
+            progress: 0.11,
+            severityScore: 9.2,
+            confidence: 0.98,
+            metric: 'Ø 78cm • Prof. ~11cm',
+            confirmations: 4,
+            source: 'Celular no Painel / Cabine Frota',
+            ageMs: 95000,
+            dispatched: false
+          },
+          {
+            type: 'CROSSWALK',
+            progress: 0.34,
+            severityScore: 8.1,
+            confidence: 0.96,
+            metric: 'Desgaste 85% • Risco Pedestre',
+            confirmations: 3,
+            source: 'Moto Scanner (Delivery / Trânsito)',
+            ageMs: 210000,
+            dispatched: false
+          },
+          {
+            type: 'WASTE',
+            progress: 0.58,
+            severityScore: 7.5,
+            confidence: 0.95,
+            metric: 'Vol. ~1.4m³ • Obstrução Bordo',
+            confirmations: 2,
+            source: 'App Celular (Foto Cidadão + IA)',
+            ageMs: 360000,
+            dispatched: true,
+            osNumber: 'OS-2026-8841'
+          },
+          {
+            type: 'CRACK',
+            progress: 0.83,
+            severityScore: 6.2,
+            confidence: 0.94,
+            metric: 'Rede 2.8m • Fissura Grau 3',
+            confirmations: 5,
+            source: 'Celular no Painel / Cabine Frota',
+            ageMs: 520000,
+            dispatched: false
+          }
+        ];
+
+        state.incidents = seeds.map((s, idx) => {
+          const meta = ANOMALY_META[s.type];
+          const pt = getRoutePoint(s.progress);
+          return {
+            id: `URB-${101 + idx}`,
+            type: s.type,
+            title: meta.label,
+            severity: meta.severity,
+            severityScore: s.severityScore,
+            confidence: s.confidence,
+            metric: s.metric,
+            street: pt.street,
+            district: pt.district,
+            lat: pt.lat,
+            lng: pt.lng,
+            mapX: pt.x,
+            mapY: pt.y,
+            confirmations: s.confirmations,
+            source: s.source,
+            createdAt: Date.now() - s.ageMs,
+            status: s.dispatched ? 'DISPATCHED' : 'PENDING',
+            osNumber: s.osNumber || null,
+            snapshotUrl: generateSnapshotDataUrl(s.type, s.confidence, s.metric),
+            isNew: false
+          };
+        }).reverse();
+
+        state.selectedIncidentId = state.incidents[0].id;
+      }
+
+      function spawnRoadAnomaly(type, zStart = 0.86) {
+        const meta = ANOMALY_META[type];
+        const laneX = randBetween(meta.laneXRange[0], meta.laneXRange[1]);
+        const confidence = randBetween(meta.confRange[0], meta.confRange[1]);
+        const severityScore = Number(randBetween(meta.scoreRange[0], meta.scoreRange[1]).toFixed(1));
+        const metric = pickRandom(meta.metrics);
+
+        const item = {
+          localId: Math.random().toString(36).slice(2),
+          type,
+          laneX,
+          z: zStart,
+          confidence,
+          severityScore,
+          metric,
+          frames: 0,
+          transmitted: false
+        };
+        state.anomaliesOnRoad.push(item);
+        return item;
+      }
+
+      function transmitAnomalyToCity(anomaly, overrideSourceLabel) {
+        const meta = ANOMALY_META[anomaly.type];
+        const pt = getRoutePoint(state.routeProgress);
+        const profile = CAM_PROFILES[state.cameraMode];
+        const id = `URB-${state.nextSeq++}`;
+
+        let snapshotUrl = '';
+        try {
+          const off = document.createElement('canvas');
+          off.width = scannerCanvas.width;
+          off.height = scannerCanvas.height;
+          renderRoadScene(off.getContext('2d'), off.width, off.height, [anomaly], state.timeSec, state.roadOffset, state.cameraMode, { includeForeground: false, includeFlash: false });
+          snapshotUrl = off.toDataURL('image/png');
+        } catch (err) {
+          snapshotUrl = generateSnapshotDataUrl(anomaly.type, anomaly.confidence, anomaly.metric);
+        }
+
+        const newIncident = {
+          id,
+          type: anomaly.type,
+          title: meta.label,
+          severity: meta.severity,
+          severityScore: anomaly.severityScore,
+          confidence: anomaly.confidence,
+          metric: anomaly.metric,
+          street: pt.street,
+          district: pt.district,
+          lat: pt.lat,
+          lng: pt.lng,
+          mapX: pt.x + randBetween(-6, 6),
+          mapY: pt.y + randBetween(-6, 6),
+          confirmations: 1,
+          source: overrideSourceLabel || profile.sourceLabel,
+          createdAt: Date.now(),
+          status: 'PENDING',
+          osNumber: null,
+          snapshotUrl,
+          isNew: true
+        };
+
+        state.incidents.unshift(newIncident);
+        if (state.incidents.length > 40) state.incidents.pop();
+        state.sessionDetections += 1;
+        state.selectedIncidentId = newIncident.id;
+
+        state.mapPulses.push({
+          x: newIncident.mapX,
+          y: newIncident.mapY,
+          color: severityColor(newIncident.severity),
+          progress: 0
+        });
+
+        toastTitle.textContent = overrideSourceLabel
+          ? `📸 Foto analisada: ${meta.label} (${meta.severity})`
+          : `⚡ Auto-Scan: ${meta.label} enviada à Prefeitura`;
+        toastMeta.textContent = `${pt.street} • Score ${anomaly.severityScore}/10 • GPS ${pt.lat.toFixed(4)}, ${pt.lng.toFixed(4)}`;
+        hudTelemetryToast.classList.remove('hidden');
+        state.toastTimer = 3.0;
+
+        syncPhoneBentoWithIncident(newIncident);
+        updateDashboardUI();
+      }
+
+      function triggerManualPhotoCapture() {
+        let target = state.anomaliesOnRoad.find((a) => !a.transmitted && a.z >= 0.14 && a.z <= 0.78);
+        if (!target) {
+          state.anomaliesOnRoad = [];
+          target = spawnRoadAnomaly(getCurrentTargetType(), 0.38);
+          target.frames = 6;
+        }
+
+        target.transmitted = true;
+        state.shutterFlash = 0.85;
+        state.photoFreezeTimer = 0.90;
+        state.isPlaying = true;
+        playPauseIcon.textContent = '❚❚';
+
+        transmitAnomalyToCity(target, 'App Celular (Foto Cidadão + IA)');
+      }
+
+      function renderSeverityGauge(score, severity) {
+        const totalTicks = 28;
+        const activeTicks = Math.round((Math.min(10, Math.max(0, score)) / 10) * totalTicks);
+        const startDeg = 135;
+        const sweepDeg = 270;
+        const cx = 45;
+        const cy = 38;
+        const rInner = 24;
+        const rOuter = 30;
+        const activeColor = severity === 'CRÍTICO' ? '#ef4444' : severity === 'ALTO' ? '#facc15' : '#38bdf8';
+
+        let svgContent = '';
+        for (let i = 0; i < totalTicks; i++) {
+          const deg = startDeg + (i / (totalTicks - 1)) * sweepDeg;
+          const rad = (deg * Math.PI) / 180;
+          const x1 = cx + Math.cos(rad) * rInner;
+          const y1 = cy + Math.sin(rad) * rInner;
+          const x2 = cx + Math.cos(rad) * rOuter;
+          const y2 = cy + Math.sin(rad) * rOuter;
+          const color = i < activeTicks ? activeColor : 'rgba(255,255,255,0.16)';
+          svgContent += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${color}" stroke-width="2" stroke-linecap="round" />`;
+        }
+        severityGaugeTicks.innerHTML = svgContent;
+        phoneSeverityNum.textContent = score.toFixed(1);
+        phoneSeverityText.textContent = severity;
+        phoneSeverityText.style.color = activeColor;
+      }
+
+      function syncTargetSelectorUI() {
+        const type = getCurrentTargetType();
+        const meta = ANOMALY_META[type];
+        const svg = getTargetSvg(type);
+
+        phoneTargetIconBox.innerHTML = svg;
+        phoneTargetLabel.textContent = meta.shortLabel;
+        floatTargetPreview.innerHTML = svg;
+        floatTargetTitle.textContent = meta.shortLabel;
+
+        const barsHtml = TARGET_ORDER.map((t, idx) => {
+          const active = idx === state.selectedTargetIdx;
+          return `<span class="h-1 rounded-full ${active ? 'bg-[#facc15]' : 'bg-white/15'}"></span>`;
+        }).join('');
+        phoneTargetBars.innerHTML = barsHtml;
+        floatTargetBars.innerHTML = barsHtml;
+      }
+
+      function syncPhoneBentoWithIncident(inc) {
+        if (!inc) return;
+        renderSeverityGauge(inc.severityScore, inc.severity);
+
+        const pct = Math.round(inc.confidence * 100);
+        iaRingPct.textContent = `${pct}%`;
+        const circ = 138.2;
+        iaRingArc.setAttribute('stroke-dashoffset', String(circ * (1 - inc.confidence)));
+
+        phoneLastSnap.src = inc.snapshotUrl;
+        phoneLastId.textContent = `#${inc.id}`;
+        phoneLastSub.textContent = inc.status === 'DISPATCHED' ? `✓ ${inc.osNumber}` : 'Enviado GPS';
+
+        floatSnapImg.src = inc.snapshotUrl;
+        floatSnapStreet.textContent = inc.street;
+        floatSnapScore.textContent = `${inc.severityScore}/10`;
+      }
+
+      function syncCameraAndModeUI() {
+        const profile = CAM_PROFILES[state.cameraMode];
+        phoneTripTitle.textContent = profile.title;
+        hudCamTag.textContent = state.autoScan ? `${profile.hudTag}` : 'MODO FOTO';
+
+        document.querySelectorAll('.cam-mode-btn').forEach((btn) => {
+          const active = btn.dataset.cam === state.cameraMode;
+          btn.className = active
+            ? 'cam-mode-btn px-2 py-0.5 rounded-full font-semibold transition cursor-pointer bg-[#facc15] text-slate-950'
+            : 'cam-mode-btn px-2 py-0.5 rounded-full font-medium transition cursor-pointer text-zinc-300 hover:text-white';
+        });
+
+        if (state.autoScan) {
+          modeAutoBtn.className = 'px-2.5 py-1 rounded-full font-semibold transition cursor-pointer lumo-yellow';
+          modeManualBtn.className = 'px-2.5 py-1 rounded-full font-medium transition cursor-pointer text-zinc-300 hover:text-white';
+          phoneTripStatus.textContent = 'Auto-Scan';
+          phoneTripStatus.className = 'text-[10px] text-emerald-400 font-semibold';
+          viewfinderHint.textContent = 'IA escaneando vídeo automaticamente';
+        } else {
+          modeManualBtn.className = 'px-2.5 py-1 rounded-full font-semibold transition cursor-pointer lumo-yellow';
+          modeAutoBtn.className = 'px-2.5 py-1 rounded-full font-medium transition cursor-pointer text-zinc-300 hover:text-white';
+          phoneTripStatus.textContent = 'Foto Cidadão';
+          phoneTripStatus.className = 'text-[10px] text-amber-300 font-semibold';
+          viewfinderHint.textContent = 'Toque no alvo ou clique em Tirar Foto';
+        }
+
+        const speedText = `${state.speedKmh} km/h`;
+        phoneTripSpeed.textContent = state.autoScan ? speedText : 'A pé / Parado';
+        phoneSpeedReadout.textContent = speedText;
+        speedSlider.value = String(state.speedKmh);
+      }
+
+      function drawMap() {
+        const W = mapCanvas.width;
+        const H = mapCanvas.height;
+        const c = themeColors;
+
+        mCtx.fillStyle = c.content;
+        mCtx.fillRect(0, 0, W, H);
+
+        mCtx.strokeStyle = c.isLight ? 'rgba(148, 163, 184, 0.22)' : 'rgba(148, 163, 184, 0.08)';
+        mCtx.lineWidth = 1;
+        for (let gx = 40; gx < W; gx += 40) {
+          mCtx.beginPath(); mCtx.moveTo(gx, 0); mCtx.lineTo(gx, H); mCtx.stroke();
+        }
+        for (let gy = 40; gy < H; gy += 40) {
+          mCtx.beginPath(); mCtx.moveTo(0, gy); mCtx.lineTo(W, gy); mCtx.stroke();
+        }
+
+        mCtx.fillStyle = c.isLight ? 'rgba(203, 213, 225, 0.5)' : 'rgba(30, 41, 59, 0.58)';
+        const blocks = [
+          [128, 120, 118, 66], [268, 120, 120, 66], [412, 120, 102, 66],
+          [128, 206, 118, 62], [412, 206, 102, 62],
+          [22, 120, 50, 66], [22, 206, 50, 62],
+          [568, 120, 54, 66], [568, 206, 54, 62],
+          [128, 24, 118, 44], [268, 24, 120, 44], [412, 24, 102, 44],
+          [128, 318, 118, 44], [268, 318, 120, 44], [412, 318, 102, 44]
+        ];
+        for (const [bx, by, bw, bh] of blocks) {
+          mCtx.fillRect(bx, by, bw, bh);
+        }
+
+        mCtx.fillStyle = c.isLight ? 'rgba(34, 197, 94, 0.16)' : 'rgba(34, 197, 94, 0.13)';
+        mCtx.strokeStyle = c.isLight ? 'rgba(22, 163, 74, 0.3)' : 'rgba(74, 222, 128, 0.25)';
+        mCtx.lineWidth = 1;
+        mCtx.fillRect(268, 206, 120, 62);
+        mCtx.strokeRect(268, 206, 120, 62);
+        mCtx.fillStyle = c.muted;
+        mCtx.font = '10px sans-serif';
+        mCtx.fillText('Parque Municipal', 286, 240);
+
+        mCtx.strokeStyle = c.isLight ? '#cbd5e1' : '#334155';
+        mCtx.lineWidth = 8;
+        mCtx.beginPath();
+        mCtx.moveTo(257, 16); mCtx.lineTo(257, H - 16);
+        mCtx.moveTo(400, 16); mCtx.lineTo(400, H - 16);
+        mCtx.moveTo(16, 196); mCtx.lineTo(W - 16, 196);
+        mCtx.stroke();
+
+        mCtx.strokeStyle = c.isLight ? '#94a3b8' : '#475569';
+        mCtx.lineWidth = 14;
+        mCtx.lineJoin = 'round';
+        mCtx.beginPath();
+        mCtx.moveTo(ROUTE_WAYPOINTS[0].x, ROUTE_WAYPOINTS[0].y);
+        for (let i = 1; i < ROUTE_WAYPOINTS.length; i++) {
+          mCtx.lineTo(ROUTE_WAYPOINTS[i].x, ROUTE_WAYPOINTS[i].y);
+        }
+        mCtx.closePath();
+        mCtx.stroke();
+
+        mCtx.save();
+        mCtx.strokeStyle = c.primary;
+        mCtx.lineWidth = 2.5;
+        mCtx.setLineDash([8, 6]);
+        mCtx.beginPath();
+        mCtx.moveTo(ROUTE_WAYPOINTS[0].x, ROUTE_WAYPOINTS[0].y);
+        for (let i = 1; i < ROUTE_WAYPOINTS.length; i++) {
+          mCtx.lineTo(ROUTE_WAYPOINTS[i].x, ROUTE_WAYPOINTS[i].y);
+        }
+        mCtx.closePath();
+        mCtx.stroke();
+        mCtx.restore();
+
+        mCtx.fillStyle = c.muted;
+        mCtx.font = 'bold 10px sans-serif';
+        mCtx.fillText('AV. PAULISTA', 278, 78);
+        mCtx.fillText('AV. 9 DE JULHO', 274, 314);
+        mCtx.save();
+        mCtx.translate(80, 224);
+        mCtx.rotate(-Math.PI / 2);
+        mCtx.fillText('RUA AUGUSTA', 0, 0);
+        mCtx.restore();
+        mCtx.save();
+        mCtx.translate(564, 150);
+        mCtx.rotate(Math.PI / 2);
+        mCtx.fillText('AV. BRIGADEIRO', 0, 0);
+        mCtx.restore();
+
+        for (const pulse of state.mapPulses) {
+          const radius = 8 + pulse.progress * 38;
+          const alpha = Math.max(0, 1 - pulse.progress);
+          mCtx.save();
+          mCtx.strokeStyle = pulse.color;
+          mCtx.globalAlpha = alpha;
+          mCtx.lineWidth = 2.5;
+          mCtx.beginPath();
+          mCtx.arc(pulse.x, pulse.y, radius, 0, Math.PI * 2);
+          mCtx.stroke();
+          mCtx.restore();
+        }
+
+        state.pinHitBoxes = [];
+        const filtered = getFilteredIncidents();
+        for (const inc of filtered) {
+          const isSelected = inc.id === state.selectedIncidentId;
+          const isHovered = inc.id === state.hoveredPinId;
+          const pinColor = inc.status === 'DISPATCHED' ? c.success : severityColor(inc.severity);
+          const r = isSelected ? 10 : isHovered ? 9 : 7.5;
+
+          if (inc.severity === 'CRÍTICO' && inc.status === 'PENDING') {
+            const pWave = (Math.sin(state.timeSec * 5) + 1) * 0.5;
+            mCtx.save();
+            mCtx.strokeStyle = pinColor;
+            mCtx.globalAlpha = 0.55 - pWave * 0.4;
+            mCtx.lineWidth = 2;
+            mCtx.beginPath();
+            mCtx.arc(inc.mapX, inc.mapY, r + 4 + pWave * 6, 0, Math.PI * 2);
+            mCtx.stroke();
+            mCtx.restore();
+          }
+
+          if (isSelected) {
+            mCtx.strokeStyle = c.foreground;
+            mCtx.lineWidth = 2.5;
+            mCtx.beginPath();
+            mCtx.arc(inc.mapX, inc.mapY, r + 4, 0, Math.PI * 2);
+            mCtx.stroke();
+          }
+
+          mCtx.fillStyle = pinColor;
+          mCtx.beginPath();
+          mCtx.arc(inc.mapX, inc.mapY, r, 0, Math.PI * 2);
+          mCtx.fill();
+
+          mCtx.fillStyle = '#ffffff';
+          mCtx.beginPath();
+          mCtx.arc(inc.mapX, inc.mapY, 2.5, 0, Math.PI * 2);
+          mCtx.fill();
+
+          state.pinHitBoxes.push({ id: inc.id, x: inc.mapX, y: inc.mapY, r: 14, incident: inc });
+        }
+
+        const veh = getRoutePoint(state.routeProgress);
+        mCtx.save();
+        mCtx.translate(veh.x, veh.y);
+        mCtx.rotate(veh.angle);
+
+        const coneGrad = mCtx.createLinearGradient(0, 0, 38, 0);
+        coneGrad.addColorStop(0, 'rgba(250, 204, 21, 0.55)');
+        coneGrad.addColorStop(1, 'rgba(250, 204, 21, 0)');
+        mCtx.fillStyle = coneGrad;
+        mCtx.beginPath();
+        mCtx.moveTo(4, 0);
+        mCtx.lineTo(38, -16);
+        mCtx.lineTo(38, 16);
+        mCtx.closePath();
+        mCtx.fill();
+
+        mCtx.fillStyle = '#facc15';
+        mCtx.strokeStyle = '#0f172a';
+        mCtx.lineWidth = 2;
+        mCtx.beginPath();
+        mCtx.moveTo(11, 0);
+        mCtx.lineTo(-8, -7);
+        mCtx.lineTo(-5, 0);
+        mCtx.lineTo(-8, 7);
+        mCtx.closePath();
+        mCtx.fill();
+        mCtx.stroke();
+        mCtx.restore();
+
+        mCtx.fillStyle = c.card;
+        mCtx.strokeStyle = c.border;
+        mCtx.lineWidth = 1;
+        mCtx.fillRect(12, H - 32, 204, 22);
+        mCtx.strokeRect(12, H - 32, 204, 22);
+        mCtx.fillStyle = '#facc15';
+        mCtx.beginPath();
+        mCtx.arc(23, H - 21, 4, 0, Math.PI * 2);
+        mCtx.fill();
+        mCtx.fillStyle = c.foreground;
+        mCtx.font = '11px sans-serif';
+        mCtx.fillText('Câmera Ativa (App / Veículo)', 33, H - 17);
+      }
+
+      function getFilteredIncidents() {
+        return state.incidents.filter((inc) => {
+          const catOk = state.filterCategory === 'ALL' || inc.type === state.filterCategory;
+          const sevOk = state.filterSeverity === 'ALL' || inc.severity === state.filterSeverity;
+          return catOk && sevOk;
+        });
+      }
+
+      function dispatchServiceOrder(incidentId) {
+        const inc = state.incidents.find((i) => i.id === incidentId);
+        if (!inc || inc.status === 'DISPATCHED') return;
+        inc.status = 'DISPATCHED';
+        inc.osNumber = `OS-2026-${Math.floor(8850 + Math.random() * 900)}`;
+        syncPhoneBentoWithIncident(inc);
+        updateDashboardUI();
+        drawMap();
+      }
+
+      function confirmCrossVehicle(incidentId) {
+        const inc = state.incidents.find((i) => i.id === incidentId);
+        if (!inc) return;
+        inc.confirmations += 1;
+        inc.confidence = Math.min(0.99, Number((inc.confidence + 0.01).toFixed(2)));
+        updateDashboardUI();
+      }
+
+      function renderDetailPanel() {
+        const inc = state.incidents.find((i) => i.id === state.selectedIncidentId) || state.incidents[0];
+        if (!inc) {
+          detailIdBadge.textContent = '--';
+          detailPanelBody.innerHTML = `<div class="text-xs text-[var(--muted-foreground)] py-8 text-center">Nenhuma ocorrência selecionada.</div>`;
+          return;
+        }
+
+        detailIdBadge.textContent = `#${inc.id}`;
+        const sevClass = severityBadgeClass(inc.severity);
+        const isDispatched = inc.status === 'DISPATCHED';
+        const scoreWidth = Math.min(100, Math.round(inc.severityScore * 10));
+
+        detailPanelBody.innerHTML = `
+          <div class="space-y-3">
+            <div class="relative rounded-lg overflow-hidden border border-[var(--border)] bg-slate-950">
+              <img src="${inc.snapshotUrl}" alt="Evidência capturada por IA" class="w-full h-36 object-cover block" />
+              <div class="absolute top-2 left-2 flex items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded text-xs font-semibold bg-black/75 text-white backdrop-blur-sm">${inc.title}</span>
+              </div>
+              <div class="absolute bottom-2 right-2">
+                <span class="px-2 py-0.5 rounded text-xs font-mono bg-black/75 text-emerald-300 backdrop-blur-sm">IA ${Math.round(inc.confidence * 100)}%</span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="${sevClass} text-xs font-semibold px-2.5 py-0.5 rounded-full">${inc.severity} • ${inc.severityScore}/10</span>
+              ${isDispatched
+                ? `<span class="badge-success text-xs font-semibold px-2.5 py-0.5 rounded-full">✓ ${inc.osNumber}</span>`
+                : `<span class="text-xs font-medium text-[var(--muted-foreground)]">${formatTimeAgo(inc.createdAt)}</span>`}
+            </div>
+
+            <div>
+              <div class="text-xs text-[var(--muted-foreground)] mb-1 flex justify-between">
+                <span>Índice de Gravidade</span>
+                <span class="font-mono font-semibold text-[var(--foreground)]">${inc.metric}</span>
+              </div>
+              <div class="w-full h-1.5 rounded-full surface-subtle overflow-hidden">
+                <div class="h-full rounded-full" style="width:${scoreWidth}%; background-color:${severityColor(inc.severity)};"></div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs surface-subtle p-2.5 rounded-lg border border-[var(--card-border)]">
+              <div>
+                <span class="text-[var(--muted-foreground)] block">Localização GPS</span>
+                <span class="font-semibold block truncate" title="${inc.street}">${inc.street}</span>
+                <span class="font-mono text-[var(--muted-foreground)]">${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}</span>
+              </div>
+              <div>
+                <span class="text-[var(--muted-foreground)] block">Origem &amp; Validação</span>
+                <span class="font-semibold block">${inc.confirmations} ${inc.confirmations === 1 ? 'registro' : 'registros'}</span>
+                <span class="text-[var(--muted-foreground)] truncate block" title="${inc.source}">${inc.source}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 flex items-center gap-2">
+            ${isDispatched
+              ? `<button disabled class="w-full text-xs font-semibold py-2 px-3 rounded-lg badge-success cursor-default">Equipe Acionada (${inc.osNumber})</button>`
+              : `<button id="detailDispatchBtn" class="w-full btn-primary text-xs font-semibold py-2 px-3 rounded-lg transition cursor-pointer">Gerar OS / Acionar Equipe</button>`}
+            <button id="detailConfirmBtn" title="Simular outro veículo confirmando" class="btn-outline text-xs font-medium py-2 px-2.5 rounded-lg shrink-0 cursor-pointer">
+              +1 Veículo
+            </button>
+          </div>
+        `;
+
+        const dispatchBtn = document.getElementById('detailDispatchBtn');
+        if (dispatchBtn) dispatchBtn.addEventListener('click', () => dispatchServiceOrder(inc.id));
+        const confirmBtn = document.getElementById('detailConfirmBtn');
+        if (confirmBtn) confirmBtn.addEventListener('click', () => confirmCrossVehicle(inc.id));
+      }
+
+      function renderIncidentQueue() {
+        const list = getFilteredIncidents();
+        if (list.length === 0) {
+          incidentQueueList.innerHTML = `<div class="p-6 text-center text-xs text-[var(--muted-foreground)]">Nenhuma ocorrência corresponde aos filtros atuais.</div>`;
+          return;
+        }
+
+        incidentQueueList.innerHTML = list.map((inc) => {
+          const selected = inc.id === state.selectedIncidentId;
+          const isDispatched = inc.status === 'DISPATCHED';
+          const sevClass = severityBadgeClass(inc.severity);
+          const rowBg = selected ? 'surface-subtle' : '';
+          const flashClass = inc.isNew ? 'card-new-flash' : '';
+
+          return `
+            <div data-inc-id="${inc.id}" class="incident-row p-3 transition cursor-pointer hover:bg-[var(--content)] ${rowBg} ${flashClass} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-start gap-3 min-w-0">
+                <img src="${inc.snapshotUrl}" alt="${inc.title}" class="w-16 h-11 rounded-md object-cover border border-[var(--border)] shrink-0 bg-slate-900" />
+                <div class="min-w-0 space-y-1">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="text-xs font-mono font-semibold text-[var(--muted-foreground)]">#${inc.id}</span>
+                    <span class="text-xs font-bold truncate">${inc.title}</span>
+                    <span class="${sevClass} text-xs font-semibold px-2 py-0.2 rounded-full">${inc.severity}</span>
+                    ${isDispatched ? `<span class="badge-success text-xs font-medium px-2 py-0.2 rounded-full">✓ ${inc.osNumber}</span>` : ''}
+                  </div>
+                  <div class="text-xs text-[var(--muted-foreground)] flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                    <span class="font-medium text-[var(--foreground)]">${inc.street}</span>
+                    <span>•</span>
+                    <span class="font-mono">${inc.lat.toFixed(4)}, ${inc.lng.toFixed(4)}</span>
+                    <span>•</span>
+                    <span>${inc.confirmations}x confirmado</span>
+                    <span>•</span>
+                    <span>${formatTimeAgo(inc.createdAt)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                ${isDispatched
+                  ? `<span class="text-xs font-semibold text-[var(--success)] px-2.5 py-1.5">Equipe em rota</span>`
+                  : `<button data-dispatch-id="${inc.id}" class="queue-dispatch-btn btn-primary text-xs font-semibold px-3 py-1.5 rounded-lg transition cursor-pointer">Gerar OS</button>`}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        for (const inc of state.incidents) inc.isNew = false;
+
+        incidentQueueList.querySelectorAll('.incident-row').forEach((row) => {
+          row.addEventListener('click', (e) => {
+            if (e.target.closest('.queue-dispatch-btn')) return;
+            state.selectedIncidentId = row.dataset.incId;
+            const found = state.incidents.find((i) => i.id === state.selectedIncidentId);
+            if (found) syncPhoneBentoWithIncident(found);
+            renderIncidentQueue();
+            renderDetailPanel();
+            drawMap();
+          });
+        });
+
+        incidentQueueList.querySelectorAll('.queue-dispatch-btn').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dispatchServiceOrder(btn.dataset.dispatchId);
+          });
+        });
+      }
+
+      function updateKPIs() {
+        const total = state.incidents.length;
+        const criticalPending = state.incidents.filter((i) => i.severity === 'CRÍTICO' && i.status === 'PENDING').length;
+        const avgConf = state.incidents.length
+          ? (state.incidents.reduce((acc, i) => acc + i.confidence, 0) / state.incidents.length) * 100
+          : 96.8;
+
+        kpiTotal.textContent = String(total);
+        kpiSessionDelta.textContent = `+${state.sessionDetections} ao vivo`;
+        kpiCritical.textContent = String(criticalPending);
+        kpiKm.textContent = state.kmScanned.toFixed(2);
+        kpiAccuracy.textContent = `${avgConf.toFixed(1)}%`;
+      }
+
+      function updateDashboardUI() {
+        updateKPIs();
+        renderDetailPanel();
+        renderIncidentQueue();
+      }
+
+      function syncViewModeButtons() {
+        document.querySelectorAll('.view-mode-btn').forEach((btn) => {
+          const active = btn.dataset.view === state.viewMode;
+          btn.className = active
+            ? 'view-mode-btn text-xs font-semibold px-3 py-1.5 rounded-md transition btn-primary shadow-sm cursor-pointer'
+            : 'view-mode-btn text-xs font-medium px-3 py-1.5 rounded-md transition text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer';
+        });
+
+        if (state.viewMode === 'split') {
+          scannerSection.className = 'xl:col-span-5 lumo-stage border border-[var(--border)] rounded-2xl overflow-hidden shadow-lg relative p-4 sm:p-5 flex flex-col justify-between';
+          dashboardSection.className = 'xl:col-span-7 space-y-4';
+          scannerSection.classList.remove('hidden');
+          dashboardSection.classList.remove('hidden');
+          floatingLeftCard.className = 'hidden';
+          floatingRightCard.className = 'hidden';
+        } else if (state.viewMode === 'scanner') {
+          scannerSection.className = 'xl:col-span-12 lumo-stage border border-[var(--border)] rounded-2xl overflow-hidden shadow-lg relative p-4 sm:p-6 flex flex-col justify-between';
+          scannerSection.classList.remove('hidden');
+          dashboardSection.classList.add('hidden');
+          floatingLeftCard.className = 'hidden lg:flex flex-col w-52 lumo-glass rounded-2xl p-3 text-white space-y-2.5 shrink-0 self-center';
+          floatingRightCard.className = 'hidden lg:flex flex-col w-52 lumo-glass rounded-2xl p-3 text-white space-y-2.5 shrink-0 self-end mb-6';
+        } else {
+          dashboardSection.className = 'xl:col-span-12 space-y-4';
+          scannerSection.classList.add('hidden');
+          dashboardSection.classList.remove('hidden');
+        }
+      }
+
+      function syncCategoryFilterButtons() {
+        document.querySelectorAll('.cat-filter-btn').forEach((btn) => {
+          const active = btn.dataset.cat === state.filterCategory;
+          btn.className = active
+            ? 'cat-filter-btn text-xs font-semibold px-2.5 py-1 rounded-md border transition badge-primary cursor-pointer'
+            : 'cat-filter-btn text-xs font-medium px-2.5 py-1 rounded-md border transition btn-outline cursor-pointer';
+        });
+      }
+
+      function stepTarget(delta) {
+        state.selectedTargetIdx = (state.selectedTargetIdx + delta + TARGET_ORDER.length) % TARGET_ORDER.length;
+        syncTargetSelectorUI();
+        state.anomaliesOnRoad = [];
+        const newTarget = spawnRoadAnomaly(getCurrentTargetType(), state.autoScan ? 0.85 : 0.40);
+        renderSeverityGauge(newTarget.severityScore, ANOMALY_META[newTarget.type].severity);
+      }
+
+      toggleCompareBtn.addEventListener('click', () => {
+        state.showComparison = !state.showComparison;
+        comparisonBanner.classList.toggle('hidden', !state.showComparison);
+        compareBtnText.textContent = state.showComparison ? 'Ocultar Comparativo' : 'Antes vs. Agora';
+      });
+
+      document.querySelectorAll('.view-mode-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.viewMode = btn.dataset.view;
+          syncViewModeButtons();
+          drawMap();
+        });
+      });
+
+      document.querySelectorAll('.cam-mode-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.cameraMode = btn.dataset.cam;
+          const profile = CAM_PROFILES[state.cameraMode];
+          state.speedKmh = profile.defaultSpeed;
+          if (state.cameraMode === 'cabin' || state.cameraMode === 'moto') {
+            state.autoScan = true;
+          }
+          syncCameraAndModeUI();
+        });
+      });
+
+      modeManualBtn.addEventListener('click', () => {
+        state.autoScan = false;
+        state.cameraMode = 'citizen';
+        state.speedKmh = CAM_PROFILES.citizen.defaultSpeed;
+        state.anomaliesOnRoad = [];
+        spawnRoadAnomaly(getCurrentTargetType(), 0.40);
+        syncCameraAndModeUI();
+      });
+
+      modeAutoBtn.addEventListener('click', () => {
+        state.autoScan = true;
+        if (state.cameraMode === 'citizen') {
+          state.cameraMode = 'cabin';
+          state.speedKmh = CAM_PROFILES.cabin.defaultSpeed;
+        }
+        syncCameraAndModeUI();
+      });
+
+      phoneHelpBtn.addEventListener('click', () => {
+        phoneHelpBanner.classList.toggle('hidden');
+      });
+
+      phoneBackBtn.addEventListener('click', () => {
+        const order = ['citizen', 'cabin', 'moto'];
+        const nextIdx = (order.indexOf(state.cameraMode) + 1) % order.length;
+        state.cameraMode = order[nextIdx];
+        state.speedKmh = CAM_PROFILES[state.cameraMode].defaultSpeed;
+        syncCameraAndModeUI();
+      });
+
+      scannerCanvas.addEventListener('click', (evt) => {
+        const rect = scannerCanvas.getBoundingClientRect();
+        state.focusNormalized = {
+          x: Math.max(0.12, Math.min(0.88, (evt.clientX - rect.left) / rect.width)),
+          y: Math.max(0.22, Math.min(0.85, (evt.clientY - rect.top) / rect.height))
+        };
+        if (!state.autoScan) {
+          triggerManualPhotoCapture();
+        }
+      });
+
+      shutterBtn.addEventListener('click', triggerManualPhotoCapture);
+      phoneQuickSnapBtn.addEventListener('click', triggerManualPhotoCapture);
+
+      prevTargetBtn.addEventListener('click', () => stepTarget(-1));
+      nextTargetBtn.addEventListener('click', () => stepTarget(1));
+      floatPrevTarget.addEventListener('click', () => stepTarget(-1));
+      floatNextTarget.addEventListener('click', () => stepTarget(1));
+
+      function injectCurrentTarget() {
+        state.isPlaying = true;
+        playPauseIcon.textContent = '❚❚';
+        const item = spawnRoadAnomaly(getCurrentTargetType(), state.autoScan ? 0.88 : 0.42);
+        renderSeverityGauge(item.severityScore, ANOMALY_META[item.type].severity);
+      }
+
+      phonePlusBtn.addEventListener('click', injectCurrentTarget);
+      phoneSpawnShortcutBtn.addEventListener('click', injectCurrentTarget);
+      phoneQuickInjectBtn.addEventListener('click', injectCurrentTarget);
+      floatSpawnBtn.addEventListener('click', injectCurrentTarget);
+
+      phoneMidActionBtn.addEventListener('click', () => {
+        state.autoScan = !state.autoScan;
+        syncCameraAndModeUI();
+      });
+
+      phoneMinusBtn.addEventListener('click', () => {
+        state.speedKmh = Math.max(20, state.speedKmh - 10);
+        syncCameraAndModeUI();
+      });
+
+      speedSlider.addEventListener('input', () => {
+        state.speedKmh = Number(speedSlider.value);
+        syncCameraAndModeUI();
+      });
+
+      playPauseBtn.addEventListener('click', () => {
+        state.isPlaying = !state.isPlaying;
+        playPauseIcon.textContent = state.isPlaying ? '❚❚' : '▶';
+        recDot.classList.toggle('animate-pulse', state.isPlaying);
+      });
+
+      document.querySelectorAll('.cat-filter-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.filterCategory = btn.dataset.cat;
+          syncCategoryFilterButtons();
+          renderIncidentQueue();
+          drawMap();
+        });
+      });
+
+      severityFilterSelect.addEventListener('change', () => {
+        state.filterSeverity = severityFilterSelect.value;
+        renderIncidentQueue();
+        drawMap();
+      });
+
+      function getMapPointerPos(evt) {
+        const rect = mapCanvas.getBoundingClientRect();
+        return {
+          x: ((evt.clientX - rect.left) / rect.width) * mapCanvas.width,
+          y: ((evt.clientY - rect.top) / rect.height) * mapCanvas.height,
+          clientX: evt.clientX - rect.left,
+          clientY: evt.clientY - rect.top
+        };
+      }
+
+      mapCanvas.addEventListener('mousemove', (evt) => {
+        const pos = getMapPointerPos(evt);
+        let hit = null;
+        for (let i = state.pinHitBoxes.length - 1; i >= 0; i--) {
+          const box = state.pinHitBoxes[i];
+          if (Math.hypot(pos.x - box.x, pos.y - box.y) <= box.r) {
+            hit = box;
+            break;
+          }
+        }
+        if (hit) {
+          state.hoveredPinId = hit.id;
+          mapCanvas.style.cursor = 'pointer';
+          mapHoverTooltip.innerHTML = `<div class="font-semibold">#${hit.incident.id} • ${hit.incident.title}</div><div class="text-[var(--muted-foreground)]">${hit.incident.street} (${hit.incident.severity})</div>`;
+          mapHoverTooltip.style.left = `${Math.min(pos.clientX + 12, mapCanvas.clientWidth - 190)}px`;
+          mapHoverTooltip.style.top = `${Math.max(8, pos.clientY - 46)}px`;
+          mapHoverTooltip.classList.remove('hidden');
+        } else {
+          state.hoveredPinId = null;
+          mapCanvas.style.cursor = 'default';
+          mapHoverTooltip.classList.add('hidden');
+        }
+      });
+
+      mapCanvas.addEventListener('mouseleave', () => {
+        state.hoveredPinId = null;
+        mapHoverTooltip.classList.add('hidden');
+      });
+
+      mapCanvas.addEventListener('click', (evt) => {
+        const pos = getMapPointerPos(evt);
+        for (let i = state.pinHitBoxes.length - 1; i >= 0; i--) {
+          const box = state.pinHitBoxes[i];
+          if (Math.hypot(pos.x - box.x, pos.y - box.y) <= box.r) {
+            state.selectedIncidentId = box.id;
+            syncPhoneBentoWithIncident(box.incident);
+            renderDetailPanel();
+            renderIncidentQueue();
+            drawMap();
+            break;
+          }
+        }
+      });
+
+      let lastFrameMs = performance.now();
+      let uiTextTick = 0;
+
+      function tick(nowMs) {
+        const dt = Math.min(0.05, (nowMs - lastFrameMs) / 1000);
+        lastFrameMs = nowMs;
+
+        if (state.shutterFlash > 0) {
+          state.shutterFlash = Math.max(0, state.shutterFlash - dt * 3.4);
+        }
+
+        if (state.photoFreezeTimer > 0) {
+          state.photoFreezeTimer = Math.max(0, state.photoFreezeTimer - dt);
+          if (state.photoFreezeTimer === 0 && !state.autoScan) {
+            state.anomaliesOnRoad = [];
+            spawnRoadAnomaly(getCurrentTargetType(), 0.42);
+          }
+        } else if (state.isPlaying) {
+          state.timeSec += dt;
+
+          if (state.autoScan) {
+            const speedFactor = state.speedKmh / 45;
+            state.roadOffset += dt * 0.55 * speedFactor;
+            state.routeProgress = (state.routeProgress + dt * 0.016 * speedFactor) % 1;
+            state.kmScanned += (state.speedKmh / 3600) * dt * 12;
+
+            const remaining = [];
+            for (const item of state.anomaliesOnRoad) {
+              item.z -= dt * 0.24 * speedFactor;
+              item.frames += 1;
+              item.confidence = Math.max(0.90, Math.min(0.99, item.confidence + (Math.random() - 0.5) * 0.008));
+
+              if (!item.transmitted && item.z <= 0.36 && item.frames >= 4) {
+                item.transmitted = true;
+                transmitAnomalyToCity(item);
+              }
+              if (item.z > 0.02) remaining.push(item);
+            }
+            state.anomaliesOnRoad = remaining;
+
+            state.autoSpawnTimer -= dt * speedFactor;
+            if (state.autoSpawnTimer <= 0 && state.anomaliesOnRoad.length < 2) {
+              spawnRoadAnomaly(pickRandom(TARGET_ORDER), 0.92);
+              state.autoSpawnTimer = randBetween(3.0, 4.8);
+            }
+          } else {
+            if (state.anomaliesOnRoad.length === 0) {
+              spawnRoadAnomaly(getCurrentTargetType(), 0.40);
+            }
+            for (const item of state.anomaliesOnRoad) {
+              item.confidence = Math.max(0.91, Math.min(0.99, item.confidence + (Math.random() - 0.5) * 0.004));
+            }
+          }
+        }
+
+        state.mapPulses = state.mapPulses
+          .map((p) => ({ ...p, progress: p.progress + dt * 0.9 }))
+          .filter((p) => p.progress < 1);
+
+        if (state.toastTimer > 0) {
+          state.toastTimer -= dt;
+          if (state.toastTimer <= 0) hudTelemetryToast.classList.add('hidden');
+        }
+
+        uiTextTick += dt;
+        if (uiTextTick >= 0.25) {
+          uiTextTick = 0;
+          const veh = getRoutePoint(state.routeProgress);
+          const coordStr = `${veh.lat.toFixed(4)}, ${veh.lng.toFixed(4)}`;
+          telemetryStreet.textContent = veh.street;
+          telemetryCoords.textContent = coordStr;
+          phoneTripStreet.textContent = veh.street;
+          phoneCoordsMini.textContent = coordStr;
+          phoneRouteProgress.style.width = `${Math.round(15 + state.routeProgress * 80)}%`;
+          kpiKm.textContent = state.kmScanned.toFixed(2);
+        }
+
+        renderRoadScene(
+          sCtx,
+          scannerCanvas.width,
+          scannerCanvas.height,
+          state.anomaliesOnRoad,
+          state.timeSec,
+          state.roadOffset,
+          state.cameraMode,
+          { includeForeground: true, includeFlash: true }
+        );
+        drawMap();
+
+        requestAnimationFrame(tick);
+      }
+
+      seedInitialIncidents();
+      syncViewModeButtons();
+      syncCategoryFilterButtons();
+      syncTargetSelectorUI();
+      syncCameraAndModeUI();
+      syncPhoneBentoWithIncident(state.incidents[0]);
+      updateDashboardUI();
+      spawnRoadAnomaly('POTHOLE', 0.40);
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>
